@@ -1,0 +1,15 @@
+experiment_name: medical_pilot_v1
+domain: medical
+input_path: data/medical/benchmark/pilot_20.csv
+output_dir: outputs/medical
+result_dir: results/medical
+model:
+  provider: mock
+  name: gpt-4o
+  temperature: 0
+  max_retries: 3
+methods: [llm_only, cot, vanilla_rag, demo]
+runtime:
+  seed: 42
+  resume: true
+  save_raw_response: true

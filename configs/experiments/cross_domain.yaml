@@ -1,0 +1,4 @@
+experiment_name: cross_domain_v1
+configs:
+  - configs/experiments/telecom_pilot.yaml
+  - configs/experiments/medical_pilot.yaml

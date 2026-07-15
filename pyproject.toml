@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "applicability-qa-lab"
+version = "0.1.0"
+description = "Applicability-aware evidence validation and decomposed execution for quantitative QA"
+requires-python = ">=3.11"
+dependencies = ["pydantic>=2.7", "PyYAML>=6.0.1", "python-dotenv>=1.0", "openai>=1.90"]
+
+[project.scripts]
+aqa-run = "applicability_qa.cli.run:main"
+aqa-evaluate = "applicability_qa.cli.evaluate:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

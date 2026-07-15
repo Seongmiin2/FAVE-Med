@@ -1,0 +1,47 @@
+from __future__ import annotations
+
+import argparse
+import random
+
+from dotenv import load_dotenv
+
+from ..core.jsonl_utils import read_jsonl, write_jsonl
+from ..pipelines import run_pipeline
+from ..providers.mock_provider import MockProvider
+from .common import load_config, load_items
+
+
+def make_provider(config):
+    model = config["model"]
+    if model.get("provider") == "mock":
+        return MockProvider()
+    from ..providers.openai_provider import OpenAIProvider
+
+    return OpenAIProvider(model["name"], model.get("temperature", 0), model.get("max_retries", 3))
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", required=True)
+    parser.add_argument("--method", choices=["llm_only", "cot", "vanilla_rag", "fave", "fave_silent", "demo", "demo_multi_executor", "fave_demo"])
+    parser.add_argument("--max-items", type=int, help="run only the first N benchmark items")
+    args = parser.parse_args()
+    load_dotenv()
+    config, root = load_config(args.config)
+    random.seed(config.get("runtime", {}).get("seed", 42))
+    items, provider = load_items(config, root), make_provider(config)
+    if args.max_items is not None:
+        if args.max_items < 1:
+            parser.error("--max-items must be at least 1")
+        items = items[: args.max_items]
+    methods = [args.method] if args.method else config["methods"]
+    for method in methods:
+        output = root / config["output_dir"] / f"{method}.jsonl"
+        completed = {row["id"] for row in read_jsonl(output)} if output.exists() and config.get("runtime", {}).get("resume") else set()
+        rows = [run_pipeline(method, item, provider, config) for item in items if item.id not in completed]
+        write_jsonl(output, rows, append=bool(completed))
+        print(f"{method}: wrote {len(rows)} rows -> {output}")
+
+
+if __name__ == "__main__":
+    main()

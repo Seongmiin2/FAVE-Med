@@ -1,0 +1,16 @@
+experiment_name: telecom_pilot_v1
+domain: telecom
+input_path: data/telecom/benchmark/fave_bench_10.jsonl
+output_dir: outputs/telecom
+result_dir: results/telecom
+model:
+  provider: mock
+  name: gpt-4o
+  temperature: 0
+  max_retries: 3
+prompt_version: v1
+methods: [llm_only, vanilla_rag, fave_silent, demo_multi_executor, fave_demo]
+runtime:
+  seed: 42
+  resume: true
+  save_raw_response: true

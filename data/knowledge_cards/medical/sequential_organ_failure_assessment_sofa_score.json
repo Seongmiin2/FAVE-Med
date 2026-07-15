@@ -1,0 +1,16 @@
+{
+  "calculator_name": "Sequential Organ Failure Assessment (SOFA) Score",
+  "task_type": "scoring",
+  "formula_or_rule": "Sum 6 organ-system scores (each already graded 0-4), total 0-24: respiration_points + coagulation_points + liver_points + cardiovascular_points + cns_points + renal_points.",
+  "required_entities": ["respiration_points", "coagulation_points", "liver_points", "cardiovascular_points", "cns_points", "renal_points"],
+  "unit_rules": {},
+  "condition_rules": {
+    "respiration_points": "PaO2/FiO2 ratio (mmHg): >=400=0, <400=1, <300=2, <200 with respiratory support=3, <100 with respiratory support=4",
+    "coagulation_points": "platelets (x10^3/uL): >=150=0, <150=1, <100=2, <50=3, <20=4",
+    "liver_points": "bilirubin (mg/dL): <1.2=0, 1.2-1.9=1, 2.0-5.9=2, 6.0-11.9=3, >=12.0=4",
+    "cardiovascular_points": "MAP or vasopressor doses: MAP>=70=0, MAP<70=1, dopamine<=5 or dobutamine any=2, dopamine>5 or epi/norepi<=0.1=3, dopamine>15 or epi/norepi>0.1=4 (vasopressor thresholds only apply if vasopressors are documented as administered)",
+    "cns_points": "Glasgow Coma Scale: 15=0, 13-14=1, 10-12=2, 6-9=3, <6=4",
+    "renal_points": "creatinine (mg/dL) or urine output: <1.2=0, 1.2-1.9=1, 2.0-3.4=2, 3.5-4.9 or urine<500mL/day=3, >=5.0 or urine<200mL/day=4"
+  },
+  "output_format": {"value": "integer, 0-24", "unit": "score"}
+}
