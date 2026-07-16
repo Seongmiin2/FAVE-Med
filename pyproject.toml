@@ -17,5 +17,5 @@ aqa-evaluate = "applicability_qa.cli.evaluate:main"
 where = ["src"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 testpaths = ["tests"]

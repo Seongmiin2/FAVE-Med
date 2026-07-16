@@ -1,0 +1,16 @@
+formula_family,candidate_count,available_source_matches
+shannon_capacity,10,99
+spectral_efficiency,10,41
+fspl_path_loss,10,246
+friis_received_power,10,79
+snr_conversion,10,159
+sinr,10,247
+outage_probability,6,6
+ber,10,21
+nyquist_rate,5,5
+mimo_capacity,7,7
+noise_power,10,208
+link_budget,10,13
+ebn0_relation,1,2
+path_loss_exponent,10,40
+doppler_shift,10,133
