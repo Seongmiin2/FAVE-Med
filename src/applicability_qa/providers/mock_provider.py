@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+import json
 import re
 
 from .base import LLMProvider
@@ -19,8 +20,13 @@ class MockProvider(LLMProvider):
         }
 
     def generate_json(self, system_prompt: str, user_prompt: str, schema: dict | None = None) -> dict:
-        if system_prompt.startswith("Classify evidence"):
+        if system_prompt.startswith("Classify evidence") or "Relevance is not sufficient for applicability" in system_prompt:
             evidence_ids = re.findall(r"^(\S+):", user_prompt, re.MULTILINE)
+            if not evidence_ids:
+                try:
+                    evidence_ids = [row["id"] for row in json.loads(user_prompt).get("candidate_evidence", [])]
+                except (json.JSONDecodeError, TypeError, KeyError):
+                    evidence_ids = []
             invalid_fixture_ids = {
                 "ev_37b5d8", "ev_e8a264", "ev_9b79a5", "ev_d5f767", "ev_292289",
                 "ev_107b9b", "ev_a50420", "ev_7d69ed", "ev_dca034", "ev_72b904",

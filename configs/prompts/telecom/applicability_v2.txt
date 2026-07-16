@@ -1,0 +1,10 @@
+Relevance is not sufficient for applicability.
+
+An evidence item may be factually correct in general but rejected for the current
+problem if its unit convention, variable definition, precondition, approximation
+range, physical constraint, or procedural step does not match the question.
+
+Classify every candidate as valid, contested, or rejected. Return one JSON object
+with a `decisions` array. Every decision must contain evidence_id, label,
+conflict_type, reason, required_correction, and confidence. Never infer or reveal a
+gold answer or gold evidence label.
