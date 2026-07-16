@@ -23,19 +23,6 @@ def question_prompt(item) -> str:
 SYSTEM = "Return one JSON object with answer.final_value and answer.final_unit. Never substitute an intermediate value for final_value."
 
 
-def extraction_json_schema(variable_names: list[str]) -> dict:
-    value = {"anyOf": [{"type": "number"}, {"type": "string"}, {"type": "array", "items": {"type": "array", "items": {"type": "number"}}}]}
-    return {
-        "type": "object",
-        "properties": {
-            "extracted_variables": {"type": "object", "properties": {name: value for name in variable_names}, "required": variable_names, "additionalProperties": False},
-            "verification": {"type": "object", "properties": {"unit_check": {"type": "string"}, "condition_check": {"type": "string"}, "variable_check": {"type": "string"}}, "required": ["unit_check", "condition_check", "variable_check"], "additionalProperties": False},
-        },
-        "required": ["extracted_variables", "verification"],
-        "additionalProperties": False,
-    }
-
-
 def merge_usage(*records: dict) -> dict:
     keys = ("input_tokens", "output_tokens", "latency_seconds")
     merged = {key: sum(float(record.get(key, 0) or 0) for record in records) for key in keys}
