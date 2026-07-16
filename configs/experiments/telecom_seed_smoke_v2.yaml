@@ -1,0 +1,23 @@
+experiment_name: telecom_seed_smoke_v2
+domain: telecom
+input_path: data/telecom/benchmark/fave_bench_10.jsonl
+output_dir: outputs/telecom/seed_smoke_v2
+result_dir: results/telecom/seed_smoke_v2
+prompt_version: telecom_applicability_v2
+schema_version: "0.3"
+evaluator_version: v2
+formula_registry_path: data/telecom/formulas/formula_registry.json
+formula_top_k: 3
+model:
+  provider: mock
+  name: mock
+  temperature: 0
+  max_retries: 1
+methods:
+  - demo_predicted_executor
+  - fave_predicted_executor
+runtime:
+  seed: 42
+  resume: false
+  save_raw_response: true
+  fail_on_gold_leakage: true

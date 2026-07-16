@@ -23,7 +23,7 @@ def make_provider(config):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
-    parser.add_argument("--method", choices=["llm_only", "cot", "vanilla_rag", "fave", "fave_silent", "demo", "demo_multi_executor", "fave_demo"])
+    parser.add_argument("--method", choices=["llm_only", "cot", "vanilla_rag", "fave", "fave_silent", "demo", "demo_multi_executor", "fave_demo", "demo_oracle_executor", "fave_oracle_executor", "demo_predicted_executor", "fave_predicted_executor"])
     parser.add_argument("--max-items", type=int, help="run only the first N benchmark items")
     args = parser.parse_args()
     load_dotenv()
@@ -35,10 +35,17 @@ def main():
             parser.error("--max-items must be at least 1")
         items = items[: args.max_items]
     methods = [args.method] if args.method else config["methods"]
+    runtime_by_id = {}
+    if config["domain"] == "telecom":
+        from ..domains.telecom.adapter import load_telecom_records
+
+        runtime_by_id = {record.runtime.id: record.runtime for record in load_telecom_records(str(root / config["input_path"]))}
+    predicted_methods = {"demo_predicted_executor", "fave_predicted_executor"}
     for method in methods:
         output = root / config["output_dir"] / f"{method}.jsonl"
         completed = {row["id"] for row in read_jsonl(output)} if output.exists() and config.get("runtime", {}).get("resume") else set()
-        rows = [run_pipeline(method, item, provider, config) for item in items if item.id not in completed]
+        selected_items = [runtime_by_id[item.id] if method in predicted_methods else item for item in items if item.id not in completed]
+        rows = [run_pipeline(method, item, provider, config) for item in selected_items]
         write_jsonl(output, rows, append=bool(completed))
         print(f"{method}: wrote {len(rows)} rows -> {output}")
 

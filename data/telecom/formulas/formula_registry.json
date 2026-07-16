@@ -1,0 +1,12 @@
+[
+  {"formula_id":"shannon_capacity","name":"Shannon channel capacity","expression":"C = B log2(1 + SNR_linear)","description":"Capacity from bandwidth and linear SNR","aliases":["Shannon capacity","channel capacity"],"executor_name":"C = B log2(1 + SNR_linear)"},
+  {"formula_id":"spectral_efficiency","name":"Spectral efficiency","expression":"eta = C / B","description":"Throughput divided by bandwidth","aliases":["bps per Hz","throughput bandwidth"],"executor_name":"eta = C / B"},
+  {"formula_id":"free_space_path_loss","name":"Free-space path loss","expression":"FSPL_dB = 20 log10(d_km) + 20 log10(f_MHz) + 32.44","description":"FSPL using distance km and frequency MHz","aliases":["FSPL","path loss"],"executor_name":"FSPL_dB = 20 log10(d_km) + 20 log10(f_MHz) + 32.44"},
+  {"formula_id":"sinr","name":"Signal to interference plus noise ratio","expression":"SINR = S / (I + N)","description":"Signal divided by interference plus noise","aliases":["SINR"],"executor_name":"SINR = S / (I + N)"},
+  {"formula_id":"rayleigh_outage","name":"Rayleigh outage probability","expression":"P_out = 1 - exp(-gamma_th / gamma_bar)","description":"Outage probability in Rayleigh fading","aliases":["outage probability"],"executor_name":"P_out = 1 - exp(-gamma_th / gamma_bar)"},
+  {"formula_id":"bpsk_ber","name":"Coherent BPSK BER","expression":"P_b = Q(sqrt(2 Eb/N0_linear))","description":"BPSK bit error rate in AWGN","aliases":["BPSK BER"],"executor_name":"P_b = Q(sqrt(2 Eb/N0_linear))"},
+  {"formula_id":"nyquist_symbol_rate","name":"Nyquist symbol rate","expression":"R_s <= 2B","description":"Maximum symbol rate of ideal baseband channel","aliases":["Nyquist rate"],"executor_name":"R_s <= 2B"},
+  {"formula_id":"mimo_capacity_identity","name":"Identity MIMO capacity","expression":"C = log2 det(I + rho / Nt * H H^H)","description":"MIMO spectral efficiency with total SNR convention","aliases":["MIMO capacity"],"executor_name":"C = log2 det(I + rho / Nt * H H^H)"},
+  {"formula_id":"friis_received_power","name":"Friis received power","expression":"Pr = Pt Gt Gr (lambda / (4 pi d))^2","description":"Free-space received power","aliases":["Friis transmission"],"executor_name":"Pr = Pt Gt Gr (lambda / (4 pi d))^2"},
+  {"formula_id":"snr_db_to_linear","name":"SNR dB to linear","expression":"SNR_linear = 10^(SNR_dB / 10)","description":"Convert a power ratio in dB to linear","aliases":["dB linear conversion"],"executor_name":"SNR_linear = 10^(SNR_dB / 10)"}
+]

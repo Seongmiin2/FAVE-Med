@@ -1,13 +1,18 @@
 from .cot import run_cot
 from .demo import run_demo
 from .demo_multi_executor import run_demo_multi_executor
+from .demo_oracle_executor import run_demo_oracle_executor
+from .demo_predicted_executor import run_demo_predicted_executor
 from .fave import run_fave
 from .fave_demo import run_fave_demo
+from .fave_oracle_executor import run_fave_oracle_executor
+from .fave_predicted_executor import run_fave_predicted_executor
 from .llm_only import run_llm_only
 from .vanilla_rag import run_vanilla_rag
 
 PIPELINES = {"llm_only": run_llm_only, "cot": run_cot, "vanilla_rag": run_vanilla_rag, "fave": run_fave, "demo": run_demo, "fave_demo": run_fave_demo}
 PIPELINES.update({"fave_silent": run_fave, "demo_multi_executor": run_demo_multi_executor})
+PIPELINES.update({"demo_oracle_executor": run_demo_oracle_executor, "fave_oracle_executor": run_fave_oracle_executor, "demo_predicted_executor": run_demo_predicted_executor, "fave_predicted_executor": run_fave_predicted_executor})
 
 
 def run_pipeline(name, item, provider, config):
