@@ -18,6 +18,12 @@ def test_first_three_pilot_formulas():
     fspl, _ = execute("FSPL_dB = 20 log10(d_km) + 20 log10(f_MHz) + 32.44", {"d": 2, "f": 2400})
     assert efficiency == 6
     assert round(fspl, 3) == 106.065
+    aliased, _ = execute("FSPL_dB = 20 log10(d_km) + 20 log10(f_MHz) + 32.44", {"d_km": 2, "f_MHz": 2400})
+    assert round(aliased, 3) == 106.065
+    shannon, _ = execute("C = B log2(1 + SNR_linear)", {"B": 10_000_000, "SNR_linear": 100})
+    assert round(shannon / 1e6, 3) == 66.582
+    normalized_efficiency, _ = execute("eta = C / B", {"C": 30_000_000, "B": 5})
+    assert normalized_efficiency == 6
 
 
 def test_all_pilot_formulas():

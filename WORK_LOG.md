@@ -126,17 +126,31 @@ python -m applicability_qa.cli.evaluate `
   --config configs/experiments/telecom_openai_3.yaml
 ```
 
-실행 순서는 `llm_only`, `vanilla_rag`, `fave_silent`, `demo_multi_executor`, `fave_demo`로 config에 고정했다. 실제 API 호출은 아직 수행하지 않았다.
+실행 순서는 `llm_only`, `vanilla_rag`, `fave_silent`, `demo_multi_executor`, `fave_demo`로 config에 고정했다. 첫 3문항 실제 API 호출과 평가를 완료했다.
 
 ## 6. 남은 문제
 
 - Telecom mock 10문항은 5개 비교 방법 모두 실행 성공했으며 accuracy와 parse success rate가 1.0이다.
 - FAVE 계열 mock의 invalid evidence precision/recall/F1은 1.0이고 valid evidence false rejection rate는 0.0이다.
-- OpenAI 3문항 및 10문항 실험은 실행 준비가 끝났지만 API 키와 비용 확인 후 수행해야 한다.
+- OpenAI 3문항 실행은 완료했다. 10문항 전체 실험은 추가 비용 확인 후 수행해야 한다.
 - Mock 결과는 실행·스키마·평가기 회귀 검증용 fixture이며 실제 모델 성능 결과로 해석하면 안 된다.
 - 지원 범위는 현재 pilot 10문항 공식에 맞춰져 있으므로 새로운 Telecom 공식이 추가되면 executor도 함께 확장해야 한다.
 
-## 7. 원본 출처
+## 7. 실제 OpenAI 3문항 결과
+
+`gpt-4o`, temperature 0, prompt version v1로 Telecom 첫 3문항을 실행했다. 총 15개 저장 결과에서 parse failure, executor failure, abstention은 없었다.
+
+| Method | Accuracy | Parse success | Invalid evidence F1 | Valid false rejection |
+|---|---:|---:|---:|---:|
+| llm_only | 0.667 | 1.000 | 0.000 | 0.000 |
+| vanilla_rag | 0.667 | 1.000 | 0.000 | 0.000 |
+| fave_silent | 0.667 | 1.000 | 1.000 | 0.000 |
+| demo_multi_executor | 1.000 | 1.000 | 0.000 | 0.000 |
+| fave_demo | 1.000 | 1.000 | 1.000 | 0.000 |
+
+표본이 3문항뿐이므로 성능 결론이 아니라 전체 10문항 실험 전 실행 검증 결과로 해석한다. 저장된 최종 결과 기준 token 합계는 input 2,135, output 708이며, evidence 판정 중간 호출 token은 최종 행 합계에 포함되지 않는다.
+
+## 8. 원본 출처
 
 This repository integrates and refactors components from:
 

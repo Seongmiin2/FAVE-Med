@@ -1,11 +1,21 @@
 from ..domains.telecom.formula_executor import execute
-from .common import SYSTEM, context, normalize
+from .common import context, normalize
+
+
+EXTRACTION_SYSTEM = (
+    "Return one JSON object only. It must contain extracted_variables and verification. "
+    "extracted_variables must use normalized numeric values without unit text. "
+    "Use the variable names shown in the formula: B and C in base SI units, d in km and f in MHz "
+    "when the formula explicitly uses d_km and f_MHz, plus rho, Nt, H, S, I, N, gamma_th, "
+    "gamma_bar, eb_n0_db, Pt, Gt, Gr, lambda, and snr_db where applicable. "
+    "Do not calculate or return the final answer."
+)
 
 
 def run_demo_multi_executor(item, provider, config):
     raw = provider.generate_json(
-        SYSTEM,
-        f"Question: {item.question}\nContext:\n{context(item)}\n"
+        EXTRACTION_SYSTEM,
+        f"Formula: {item.formula.expression}\nQuestion: {item.question}\nContext:\n{context(item)}\n"
         "Extract variables and verify units and conditions. Do not perform arithmetic.",
     )
     try:

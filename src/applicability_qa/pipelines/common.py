@@ -13,6 +13,11 @@ def context(item: BenchmarkItem, ids: list[str] | None = None) -> str:
 
 def normalize(item: BenchmarkItem, method: str, raw: dict) -> dict:
     answer = raw.get("answer", raw)
+    if "answer.final_value" in raw:
+        answer = {
+            "final_value": raw.get("answer.final_value"),
+            "final_unit": raw.get("answer.final_unit"),
+        }
     if "final_value" not in answer and "value" in answer:
         answer = {"final_value": answer["value"], "final_unit": answer.get("unit")}
     model = raw.pop("_model", None)

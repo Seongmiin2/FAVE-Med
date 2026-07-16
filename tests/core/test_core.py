@@ -1,6 +1,7 @@
 from applicability_qa.core.answer_parser import evaluate_answer
 from applicability_qa.core.jsonl_utils import read_jsonl, write_jsonl
 from applicability_qa.core.schemas import BenchmarkItem, GoldAnswer
+from applicability_qa.pipelines.common import normalize
 
 
 def test_schema_and_jsonl(tmp_path):
@@ -17,3 +18,9 @@ def test_final_value_not_intermediate_text():
 
 def test_categorical():
     assert evaluate_answer({"answer": {"final_value": "Yes"}}, {"value": "yes", "unit": None, "output_type": "categorical"}, "medical")["correct"]
+
+
+def test_dotted_answer_keys_are_normalized():
+    item = BenchmarkItem(id="1", domain="telecom", task_type="qa", question="q", gold_answer=GoldAnswer(value=1, unit="bps", output_type="telecom_quantity"))
+    result = normalize(item, "test", {"answer.final_value": 1, "answer.final_unit": "bps"})
+    assert result["answer"] == {"final_value": 1, "final_unit": "bps"}
