@@ -1,0 +1,24 @@
+experiment_name: telecom_openai_10_v1
+domain: telecom
+input_path: data/telecom/benchmark/fave_bench_10.jsonl
+output_dir: outputs/telecom/openai_10
+result_dir: results/telecom/openai_10
+prompt_version: v1
+
+model:
+  provider: openai
+  name: gpt-4o
+  temperature: 0
+  max_retries: 3
+
+methods:
+  - llm_only
+  - vanilla_rag
+  - fave_silent
+  - demo_multi_executor
+  - fave_demo
+
+runtime:
+  seed: 42
+  resume: true
+  save_raw_response: true

@@ -45,9 +45,12 @@ def execute(formula_id: str, variables: dict) -> tuple[float, str]:
     if "log2 det" in key and "h h^h" in key:
         rho = float(variables["rho"])
         antennas = int(variables["Nt"])
-        if str(variables.get("H", "identity")).lower() not in {"identity", "2x2 identity", "i"}:
+        matrix = variables.get("H", "identity")
+        identity_matrices = ([[1, 0], [0, 1]], [[1.0, 0.0], [0.0, 1.0]])
+        if matrix not in identity_matrices and str(matrix).lower() not in {"identity", "2x2 identity", "i"}:
             raise ValueError("Only identity MIMO matrices are supported")
         return antennas * math.log2(1 + rho / antennas), "bps/Hz"
     if "10^(snr_db / 10)" in key or "snr_linear" in key and "10^" in key:
-        return 10 ** (float(variables.get("snr_db", variables.get("SNR"))) / 10), "linear"
+        snr_db = variables.get("snr_db", variables.get("SNR_dB", variables.get("SNR")))
+        return 10 ** (float(snr_db) / 10), "linear"
     raise ValueError(f"Unsupported telecom formula: {formula_id}")

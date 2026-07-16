@@ -24,3 +24,20 @@ def test_dotted_answer_keys_are_normalized():
     item = BenchmarkItem(id="1", domain="telecom", task_type="qa", question="q", gold_answer=GoldAnswer(value=1, unit="bps", output_type="telecom_quantity"))
     result = normalize(item, "test", {"answer.final_value": 1, "answer.final_unit": "bps"})
     assert result["answer"] == {"final_value": 1, "final_unit": "bps"}
+
+
+def test_semantic_unit_aliases():
+    cases = [
+        ("linear ratio", "linear"),
+        ("linear scale", "linear"),
+        ("BER", "probability"),
+        ("symbols per second", "symbols/s"),
+        ("bits/s/Hz", "bps/Hz"),
+    ]
+    for predicted_unit, gold_unit in cases:
+        result = evaluate_answer(
+            {"answer": {"final_value": 1, "final_unit": predicted_unit}},
+            {"value": 1, "unit": gold_unit, "output_type": "telecom_quantity"},
+            "telecom",
+        )
+        assert result["correct"]

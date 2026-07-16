@@ -132,7 +132,7 @@ python -m applicability_qa.cli.evaluate `
 
 - Telecom mock 10문항은 5개 비교 방법 모두 실행 성공했으며 accuracy와 parse success rate가 1.0이다.
 - FAVE 계열 mock의 invalid evidence precision/recall/F1은 1.0이고 valid evidence false rejection rate는 0.0이다.
-- OpenAI 3문항 실행은 완료했다. 10문항 전체 실험은 추가 비용 확인 후 수행해야 한다.
+- OpenAI 3문항과 10문항 전체 pilot 실행을 완료했다. 다음 단계는 독립 검수된 50–100문항 확장이다.
 - Mock 결과는 실행·스키마·평가기 회귀 검증용 fixture이며 실제 모델 성능 결과로 해석하면 안 된다.
 - 지원 범위는 현재 pilot 10문항 공식에 맞춰져 있으므로 새로운 Telecom 공식이 추가되면 executor도 함께 확장해야 한다.
 
@@ -150,7 +150,13 @@ python -m applicability_qa.cli.evaluate `
 
 표본이 3문항뿐이므로 성능 결론이 아니라 전체 10문항 실험 전 실행 검증 결과로 해석한다. 저장된 최종 결과 기준 token 합계는 input 2,135, output 708이며, evidence 판정 중간 호출 token은 최종 행 합계에 포함되지 않는다.
 
-## 8. 원본 출처
+## 8. 실제 OpenAI 10문항 확대 결과
+
+Telecom pilot 전체 10문항과 다섯 방법으로 50개 최종 결과를 생성했다. 직접 답변 방법은 각각 5/10, executor 방법은 각각 10/10을 기록했다. FAVE evidence 판정은 precision 1.0, recall 0.7, F1 0.824였다. Paired exact McNemar 비교에서 executor 방법과 LLM-only 간 p-value는 0.0625로, 작은 표본에서 5% 유의수준을 충족하지 않았다.
+
+Executor 방법에는 benchmark의 gold formula가 제공되므로 이 결과는 end-to-end 공식 선택 성능이 아니라 oracle-formula 조건의 분해·결정론적 실행 상한선이다. 상세 결과와 한계는 `EXPERIMENT_REPORT.md`에 기록했다.
+
+## 9. 원본 출처
 
 This repository integrates and refactors components from:
 

@@ -24,6 +24,10 @@ def test_first_three_pilot_formulas():
     assert round(shannon / 1e6, 3) == 66.582
     normalized_efficiency, _ = execute("eta = C / B", {"C": 30_000_000, "B": 5})
     assert normalized_efficiency == 6
+    mimo, _ = execute("C = log2 det(I + rho / Nt * H H^H)", {"rho": 10, "Nt": 2, "H": [[1, 0], [0, 1]]})
+    assert round(mimo, 6) == 5.169925
+    linear, _ = execute("SNR_linear = 10^(SNR_dB / 10)", {"SNR_dB": 13})
+    assert round(linear, 6) == 19.952623
 
 
 def test_all_pilot_formulas():

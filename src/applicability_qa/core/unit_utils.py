@@ -7,7 +7,22 @@ GROUPS = {
     "frequency": {"Hz": 1.0, "kHz": 1e3, "MHz": 1e6, "GHz": 1e9},
     "power": {"W": 1.0, "mW": 1e-3, "uW": 1e-6, "µW": 1e-6, "nW": 1e-9},
 }
-ALIASES = {"mbps": "Mbps", "gbps": "Gbps", "khz": "kHz", "mhz": "MHz", "ghz": "GHz", "db": "dB", "dbm": "dBm"}
+ALIASES = {
+    "mbps": "Mbps",
+    "gbps": "Gbps",
+    "khz": "kHz",
+    "mhz": "MHz",
+    "ghz": "GHz",
+    "db": "dB",
+    "dbm": "dBm",
+    "linear ratio": "linear",
+    "linear scale": "linear",
+    "ber": "probability",
+    "symbols per second": "symbols/s",
+    "symbol/s": "symbols/s",
+    "bits/s/hz": "bps/Hz",
+    "bit/s/hz": "bps/Hz",
+}
 
 
 def canonical_unit(unit: str | None) -> str | None:
