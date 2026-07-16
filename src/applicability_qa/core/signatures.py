@@ -48,6 +48,25 @@ class EvidenceSignature(BaseModel):
     convention_tags: list[str] = Field(default_factory=list)
     procedural_steps: list[str] = Field(default_factory=list)
     factuality_claim: Literal["verified", "unverified", "false"] = "unverified"
+    observed_variables: dict[str, "ObservedVariable"] = Field(default_factory=dict)
+
+
+class ObservedVariable(BaseModel):
+    observed_value: Any
+    observed_unit: str | None = None
+    normalized_value: Any
+    normalized_unit: str | None = None
+    conversion_operation: str | None = None
+    source_span: str
+    confidence: float = Field(ge=0, le=1)
+
+
+class RuntimeFactExtraction(BaseModel):
+    variables: dict[str, ObservedVariable] = Field(default_factory=dict)
+    asserted_formula_id: str | None = None
+    convention_tags: list[str] = Field(default_factory=list)
+    procedural_steps: list[str] = Field(default_factory=list)
+    conditions: dict[str, Any] = Field(default_factory=dict)
 
 
 class CompatibilityCheck(BaseModel):

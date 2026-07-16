@@ -5,6 +5,8 @@ from ..core.execution_gate import build_execution_gate
 from ..core.planning import build_solution_plan
 from ..core.post_validation import validate_execution
 from ..core.signatures import EvidenceSignature
+from ..core.model_evidence_parser import parse_evidence_with_model
+from ..core.runtime_fact_extraction import build_execution_signature, validate_runtime_extraction
 from ..domains.medical.calculator_registry import calculator_by_id, load_calculator_registry
 from ..domains.medical.calculator_selector import select_calculator
 from ..domains.medical.evidence_signature_parser import parse_evidence_signature
@@ -28,14 +30,16 @@ def run_medical_typed_fave_retrieval_predicted_executor(item, provider, config):
         return result
     calculator = calculator_by_id(selection["predicted_formula_id"], registry)
     requirement = parse_requirement(item.patient_note, item.question, calculator)
-    signatures = [parse_evidence_signature(row, requirement) for row in retrieved]
+    parser_mode = config.get("runtime", {}).get("evidence_parser", "rule")
+    signatures = [parse_evidence_with_model(item.question, item.patient_note, row.evidence_id, row.text, provider) if parser_mode == "model" else parse_evidence_signature({"evidence_id": row.evidence_id, "text": row.text}, item.question, item.patient_note) for row in retrieved]
     passage_decisions = [verify_applicability(requirement, row) for row in signatures]
     accepted = [row.evidence_id for row in passage_decisions if row.applicable]
     evidence = "\n".join(row.text for row in retrieved if row.evidence_id in accepted)
-    raw = provider.generate_json(SYSTEM, f"{question_prompt(item)}\n\nRule: {calculator.expression}\nApplicable evidence:\n{evidence}")
-    validate_extraction(raw, config.get("runtime", {}).get("strict_structured_output", False))
-    variables = raw.get("extracted_variables", {})
-    execution_signature = EvidenceSignature(evidence_id="execution_inputs", quantities={requirement.target_quantity: requirement.target_unit}, variables=list(variables), facts=variables, asserted_formula_id=calculator.calculator_id, convention_tags=requirement.convention_tags, procedural_steps=requirement.required_procedural_steps, source_type="runtime_extraction")
+    raw = provider.generate_json("Extract independent runtime facts from patient context, question, and evidence text only. Return runtime_facts with observed/normalized values and units, conversion operation, exact source span, confidence, asserted_formula_id, convention_tags, procedural_steps, and conditions. Do not copy a supplied requirement signature.", f"{question_prompt(item)}\n\nEvidence text:\n{evidence}")
+    extraction = validate_runtime_extraction(raw)
+    variables = {name: value.normalized_value for name, value in extraction.variables.items()}
+    raw["extracted_variables"] = {name: value.model_dump() for name, value in extraction.variables.items()}
+    execution_signature = build_execution_signature(extraction)
     execution_decision = verify_applicability(requirement, execution_signature)
     gate = build_execution_gate([execution_decision])
     raw.update(requirement_signature=requirement.model_dump(), evidence_signatures=[row.model_dump() for row in signatures] + [execution_signature.model_dump()], typed_applicability_decisions=[row.model_dump() for row in passage_decisions] + [execution_decision.model_dump()], solution_plan=build_solution_plan(calculator.executor_name, requirement, passage_decisions).model_dump(), execution_gate=gate.model_dump(), accepted_evidence_ids=accepted, rejected_evidence_ids=[row.evidence_id for row in passage_decisions if not row.applicable])

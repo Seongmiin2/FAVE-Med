@@ -23,6 +23,19 @@ CASES = [
 
 class MedicalSmokeProvider(MockProvider):
     def generate_json(self, system_prompt, user_prompt, schema=None):
+        if system_prompt.startswith("Extract independent runtime facts"):
+            tags_steps = {
+                "body_mass_index": (["metric_bmi"], ["square_height_m"]), "mean_arterial_pressure": (["resting_map_approximation"], ["weight_diastolic_twice"]),
+                "anion_gap": (["potassium_excluding"], ["exclude_potassium"]), "cockcroft_gault": (["female_factor_0_85", "weight_policy_explicit"], ["apply_sex_coefficient", "select_weight_policy"]),
+                "corrected_calcium": (["coefficient_0_8", "albumin_reference_4"], ["add_albumin_correction"]), "body_surface_area_mosteller": (["mosteller"], ["square_root"]),
+                "serum_osmolality": (["us_conventional_units"], ["apply_glucose_bun_divisors"]), "fractional_excretion_sodium": (["paired_samples"], ["preserve_urine_plasma_binding"]),
+                "qtc_bazett": (["bazett"], ["divide_by_sqrt_rr"]), "meld_na": (["meld_na_2016"], ["clamp_sodium_125_137", "clamp_meld_6_40"]),
+            }
+            for _, question, entities, calculator_id in CASES:
+                if question in user_prompt:
+                    tags, steps = tags_steps[calculator_id]
+                    variables = {name: {"observed_value": value, "observed_unit": None, "normalized_value": value, "normalized_unit": None, "conversion_operation": "identity", "source_span": f"{name}={value}", "confidence": 1.0} for name, value in entities.items()}
+                    return {"runtime_facts": {"variables": variables, "asserted_formula_id": calculator_id, "convention_tags": tags, "procedural_steps": steps, "conditions": {}}}
         if system_prompt.startswith("Classify evidence") or "Relevance is not sufficient" in system_prompt:
             payload = json.loads(user_prompt)
             return {"decisions": [{"evidence_id": row["id"], "label": "rejected" if row["id"].endswith("_trap") else "valid", "conflict_type": "formula_convention" if row["id"].endswith("_trap") else "none", "reason": "deterministic smoke label", "confidence": 1.0} for row in payload["candidate_evidence"]]}

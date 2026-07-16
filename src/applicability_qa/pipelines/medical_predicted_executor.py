@@ -21,10 +21,10 @@ def run_medical_predicted_executor(item, provider, config):
     else:
         calculator = calculator_by_id(selection["predicted_formula_id"], registry)
         evidence = "\n".join(f"- {row.id}: {row.text}" for row in item.evidence)
-        raw = provider.generate_json(SYSTEM, f"{question_prompt(item)}\n\nRule: {calculator.expression}\nEvidence:\n{evidence}")
+        raw = provider.generate_json(SYSTEM, f"{question_prompt(item)}\n\nEvidence:\n{evidence}")
         validate_extraction(raw, config.get("runtime", {}).get("strict_structured_output", False))
         requirement = requirement_from_formula(calculator)
-        signatures = evidence_signatures_from_extraction([row.id for row in item.evidence], raw.get("extracted_variables", {}), requirement)
+        signatures = evidence_signatures_from_extraction([row.id for row in item.evidence], raw.get("extracted_variables", {}))
         decisions = [verify_applicability(requirement, signature) for signature in signatures]
         gate = build_execution_gate(decisions)
         raw.update(requirement_signature=requirement.model_dump(), evidence_signatures=[row.model_dump() for row in signatures], typed_applicability_decisions=[row.model_dump() for row in decisions], solution_plan=build_solution_plan(calculator.executor_name, requirement, decisions).model_dump(), execution_gate=gate.model_dump())

@@ -11,8 +11,32 @@ def _check(kind: str, passed: bool, code: str, message: str, evidence_id: str, b
 def check_unit(requirement: RequirementSignature, evidence: EvidenceSignature) -> CompatibilityCheck:
     observed = evidence.quantities.get(requirement.target_quantity)
     mismatches = {item.name: {"required": item.canonical_unit, "observed": evidence.variable_units[item.name]} for item in requirement.required_inputs if item.name in evidence.variable_units and evidence.variable_units[item.name] != item.canonical_unit}
-    passed = (observed is None or observed == requirement.target_unit) and not mismatches
-    return _check("unit", passed, "unit_ok" if passed else "unit_mismatch", f"target unit requires {requirement.target_unit}; observed {observed or 'unspecified'}; variable mismatches={mismatches}", evidence.evidence_id, required=requirement.target_unit, observed=observed, variable_mismatches=mismatches)
+    omitted = [name for name, value in evidence.observed_variables.items() if value.observed_unit and value.normalized_unit and value.observed_unit != value.normalized_unit and not value.conversion_operation]
+    passed = (observed is None or observed == requirement.target_unit) and not mismatches and not omitted
+    code = "unit_ok" if passed else "conversion_omitted" if omitted else "unit_mismatch"
+    return _check("unit", passed, code, f"target unit requires {requirement.target_unit}; observed {observed or 'unspecified'}; variable mismatches={mismatches}; omitted conversions={omitted}", evidence.evidence_id, required=requirement.target_unit, observed=observed, variable_mismatches=mismatches, omitted_conversions=omitted)
+
+
+BINDING_TERMS = {
+    "B": ("bandwidth",), "C": ("capacity", "throughput"), "snr_linear": ("snr",),
+    "S": ("signal",), "I": ("interference",), "N": ("noise",),
+    "sodium": ("sodium",), "chloride": ("chloride",), "bicarbonate": ("bicarbonate",),
+    "urine_sodium": ("urine sodium",), "plasma_sodium": ("plasma sodium",),
+    "urine_creatinine": ("urine creatinine",), "plasma_creatinine": ("plasma creatinine",),
+    "systolic_bp": ("systolic",), "diastolic_bp": ("diastolic",),
+}
+
+
+def check_variable_binding(requirement: RequirementSignature, evidence: EvidenceSignature) -> CompatibilityCheck:
+    conflicts = []
+    for name, value in evidence.observed_variables.items():
+        span = value.source_span.lower().replace("_", " ")
+        own = BINDING_TERMS.get(name, (name.lower().replace("_", " "),))
+        other = [other_name for other_name, terms in BINDING_TERMS.items() if other_name != name and any(term in span for term in terms)]
+        if other and not any(term in span for term in own):
+            conflicts.append({"variable": name, "span": value.source_span, "looks_like": other})
+    passed = not conflicts
+    return _check("variable_binding", passed, "binding_ok" if passed else "variable_binding_mismatch", "runtime source spans match variable bindings" if passed else f"binding conflicts: {conflicts}", evidence.evidence_id, conflicts=conflicts)
 
 
 def check_variable_coverage(requirement: RequirementSignature, evidence: EvidenceSignature) -> CompatibilityCheck:
@@ -64,7 +88,7 @@ def check_procedural_steps(requirement: RequirementSignature, evidence: Evidence
 
 
 def verify_applicability(requirement: RequirementSignature, evidence: EvidenceSignature) -> TypedApplicabilityDecision:
-    checks = [check_unit(requirement, evidence), check_variable_coverage(requirement, evidence), *check_conditions(requirement, evidence), check_convention(requirement, evidence), check_approximation(requirement, evidence), *check_physical_constraints(requirement, evidence), check_procedural_steps(requirement, evidence)]
+    checks = [check_unit(requirement, evidence), check_variable_coverage(requirement, evidence), check_variable_binding(requirement, evidence), *check_conditions(requirement, evidence), check_convention(requirement, evidence), check_approximation(requirement, evidence), *check_physical_constraints(requirement, evidence), check_procedural_steps(requirement, evidence)]
     applicable = not any(not item.passed and item.blocking for item in checks)
     warnings = [item.code for item in checks if not item.passed and not item.blocking]
     blocking = [item.code for item in checks if not item.passed and item.blocking]

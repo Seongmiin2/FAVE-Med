@@ -16,8 +16,8 @@ def requirement_from_formula(spec: Any) -> RequirementSignature:
     )
 
 
-def evidence_signatures_from_extraction(evidence_ids: list[str], variables: dict[str, Any], requirement: RequirementSignature) -> list[EvidenceSignature]:
+def evidence_signatures_from_extraction(evidence_ids: list[str], variables: dict[str, Any]) -> list[EvidenceSignature]:
     # Extracted variables are a claim-level signature. Attribution to individual
     # passages remains explicit by duplicating the claim signature per accepted ID.
     ids = evidence_ids or ["runtime_question"]
-    return [EvidenceSignature(evidence_id=evidence_id, quantities={requirement.target_quantity: requirement.target_unit}, variables=list(variables), facts=variables, source_type="accepted_runtime_context") for evidence_id in ids]
+    return [EvidenceSignature(evidence_id=evidence_id, variables=list(variables), facts=variables, source_type="independently_extracted_runtime_context") for evidence_id in ids]

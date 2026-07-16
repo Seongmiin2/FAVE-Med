@@ -32,11 +32,14 @@
 - Added typed requirement/evidence signatures, deterministic compatibility checks, solution plans, execution gates, and post-execution validation.
 - Connected the typed gate to Telecom and Medical predicted-executor paths without exposing evaluator gold at runtime.
 - Added explicitly named comparison proxy baselines and offline minimal-pair, difficulty, and benchmark-track helpers.
+- Replaced controlled-corpus signature lookup behavior with a deterministic text-only parser baseline and a model-backed structured parser whose prompt contains only question/patient context and evidence text.
+- Added independent runtime-fact extraction with observed/normalized values and units, conversion operation, source span, and confidence; execution signatures are no longer populated from requirement signatures.
+- Added 30 Telecom and 20 Medical reviewed-ready development candidates with runtime inputs separated from draft reviewer gold. These are pending human review, not frozen evaluation data.
 
 ## Validation
 
 - Historical pilot tests remain supported.
-- `pytest`: 51 passed, including dual-domain leakage, passage-level valid/trap checks, typed Telecom/Medical pipelines, post-validation, benchmark tools, strict parsing, exact dispatch, statistics, and end-to-end mock coverage.
+- The full test count is reported from the current clean validation run at handoff. Controlled valid/trap fixtures are integration tests only and must not be reported as evidence-classification performance.
 - `pip install -e .`: passed after build dependencies were available.
 - Mock end-to-end smoke completed four methods over all ten seed items; these fixture results are not model-performance evidence.
 - Real API v4 pilot produced 15 records through 21 calls with zero parse/execution failures; 4,912 input and 3,362 output tokens cost an estimated USD 0.06271.
@@ -46,10 +49,10 @@
 
 ## Remaining risks
 
-- Controlled-corpus passages now receive independent typed signatures and decisions; arbitrary open-text semantic parsing still requires a model-backed structured parser and calibration.
+- Passage-level typed parsing remains **controlled-corpus integration only**. Although both deterministic text-only and model-backed structured parsers now exist, no evidence-classification performance claim is valid until independently reviewed development data are evaluated and calibration is completed.
 - Dedicated typed Telecom and Medical retrieval-to-gate pipelines pass all ten supported families in mock integration tests.
 - Official CRAG and MedRaC commits are pinned, but faithful external runs still require their model/data/search dependencies; local proxy methods are not relabeled as reproductions.
-- Blinded review packets and independence validation are implemented; actual human and clinical labels remain pending.
+- Final reviewer packets are intentionally deferred. The 30 Telecom and 20 Medical development candidates are reviewed-ready drafts; actual independent and clinical labels remain pending.
 - Named comparison methods are controlled proxy baselines, not exact reproductions of external repositories.
 - Formula retrieval remains a deterministic lexical baseline; evidence retrieval now uses BM25.
 - Full intermediate-call accounting is implemented for the new FAVE predicted/retrieval paths but not every historical pilot method.
@@ -63,8 +66,8 @@
 
 ## Next action
 
-1. Obtain two independent reviewers, including an appropriate clinical reviewer for Medical.
-2. Complete/adjudicate review packets and freeze the reviewed development sets.
+1. Inspect the reviewed-ready development candidates, then obtain two independent reviewers, including an appropriate clinical reviewer for Medical.
+2. Only after the candidate audit, generate blinded reviewer packets, adjudicate them, and freeze the reviewed development sets.
 3. Supply official CRAG evaluator/search dependencies and MedRaC data/model configuration for faithful external runs.
 4. Freeze the test benchmark and run the pre-registered experiment only afterward.
 
@@ -76,4 +79,5 @@ python scripts/validate_candidate_pool.py
 python scripts/export_annotation_sheet.py
 python scripts/compute_annotation_agreement.py --reviewer-a reviewer_a.csv --reviewer-b reviewer_b.csv
 python scripts/import_annotation_sheet.py --annotations adjudicated.csv --output data/telecom/collection/candidate_pool_reviewed.jsonl
+python scripts/build_review_ready_development.py
 ```

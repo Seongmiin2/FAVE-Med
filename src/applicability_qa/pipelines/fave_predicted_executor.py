@@ -25,12 +25,12 @@ def run_fave_predicted_executor(item, provider, config):
         raw.update(answer={"final_value": None, "final_unit": None}, abstain=True, abstain_reason=selection["abstain_reason"], execution={"mode": "python", "success": False, "error": selection["abstain_reason"]})
     else:
         formula = formula_by_id(selection["predicted_formula_id"], registry)
-        generated = provider.generate_json(EXTRACTION_SYSTEM, f"Formula: {formula.expression}\nQuestion: {item.question}\nApplicable evidence:\n{evidence_text}")
+        generated = provider.generate_json(EXTRACTION_SYSTEM, f"Question: {item.question}\nApplicable evidence:\n{evidence_text}")
         validate_extraction(generated, strict)
         raw.update(generated)
         raw["usage"] = merge_usage(classification.usage, generated.get("usage", {}))
         requirement = requirement_from_formula(formula)
-        signatures = evidence_signatures_from_extraction(sorted(accepted), raw.get("extracted_variables", {}), requirement)
+        signatures = evidence_signatures_from_extraction(sorted(accepted), raw.get("extracted_variables", {}))
         decisions = [verify_applicability(requirement, signature) for signature in signatures]
         gate = build_execution_gate(decisions)
         raw.update(requirement_signature=requirement.model_dump(), evidence_signatures=[row.model_dump() for row in signatures], typed_applicability_decisions=[row.model_dump() for row in decisions], solution_plan=build_solution_plan(formula.executor_name, requirement, decisions).model_dump(), execution_gate=gate.model_dump())

@@ -5,6 +5,8 @@ from ..core.execution_gate import build_execution_gate
 from ..core.planning import build_solution_plan
 from ..core.post_validation import validate_execution
 from ..core.signatures import EvidenceSignature
+from ..core.model_evidence_parser import parse_evidence_with_model
+from ..core.runtime_fact_extraction import build_execution_signature, validate_runtime_extraction
 from ..domains.telecom.evidence_signature_parser import parse_evidence_signature
 from ..domains.telecom.formula_executor import execute
 from ..domains.telecom.formula_registry import formula_by_id, load_formula_registry
@@ -24,20 +26,16 @@ def run_typed_fave_retrieval_predicted_executor(item, provider, config):
         return normalize(item, "typed_fave_retrieval_predicted_executor", {"answer": {"final_value": None, "final_unit": None}, "abstain": True, "abstain_reason": selection["abstain_reason"], "execution": {"mode": "python", "success": False, "error": selection["abstain_reason"]}}) | {"formula_mode": "predicted", "formula_selection": selection, "retrieval": {"query": item.question, "top_k": top_k, "results": [row.model_dump() for row in retrieved]}}
     formula = formula_by_id(selection["predicted_formula_id"], registry)
     requirement = parse_requirement(item.question, formula)
-    signatures = [parse_evidence_signature(row, requirement) for row in retrieved]
+    parser_mode = config.get("runtime", {}).get("evidence_parser", "rule")
+    signatures = [parse_evidence_with_model(item.question, None, row.evidence_id, row.text, provider) if parser_mode == "model" else parse_evidence_signature({"evidence_id": row.evidence_id, "text": row.text}, item.question) for row in retrieved]
     passage_decisions = [verify_applicability(requirement, row) for row in signatures]
     accepted = [row.evidence_id for row in passage_decisions if row.applicable]
     context = "\n".join(row.text for row in retrieved if row.evidence_id in accepted)
-    raw = provider.generate_json(EXTRACTION_SYSTEM, f"Formula: {formula.expression}\nQuestion: {item.question}\nApplicable evidence:\n{context}")
-    validate_extraction(raw, config.get("runtime", {}).get("strict_structured_output", False))
-    variables = raw.get("extracted_variables", {})
-    normalized_facts = dict(variables)
-    for field in requirement.required_inputs:
-        if field.name not in normalized_facts:
-            alias = next((name for name in field.aliases if name in variables), None)
-            if alias is not None:
-                normalized_facts[field.name] = variables[alias]
-    execution_signature = EvidenceSignature(evidence_id="execution_inputs", quantities={requirement.target_quantity: requirement.target_unit}, variables=list(variables), facts=normalized_facts, asserted_formula_id=formula.formula_id, convention_tags=requirement.convention_tags, procedural_steps=requirement.required_procedural_steps, source_type="runtime_extraction")
+    raw = provider.generate_json("Extract independent runtime facts from the question and evidence text only. Return runtime_facts with observed/normalized values and units, conversion operation, exact source span, confidence, asserted_formula_id, convention_tags, procedural_steps, and conditions. Do not copy a supplied requirement signature.", f"Question:\n{item.question}\n\nEvidence text:\n{context}")
+    extraction = validate_runtime_extraction(raw)
+    variables = {name: value.normalized_value for name, value in extraction.variables.items()}
+    raw["extracted_variables"] = {name: value.model_dump() for name, value in extraction.variables.items()}
+    execution_signature = build_execution_signature(extraction)
     execution_decision = verify_applicability(requirement, execution_signature)
     gate = build_execution_gate([execution_decision])
     plan = build_solution_plan(formula.executor_name, requirement, passage_decisions)
