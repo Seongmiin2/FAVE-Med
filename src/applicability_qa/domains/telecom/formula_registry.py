@@ -43,7 +43,11 @@ def _upgrade_legacy(row: dict) -> dict:
     formula_id = row["formula_id"]
     upgraded = dict(row)
     upgraded["executor_name"] = formula_id
-    upgraded["required_variables"] = [{"name": name, "quantity": quantity, "canonical_unit": unit, "accepted_aliases": []} for name, quantity, unit in variable_names[formula_id]]
+    runtime_aliases = {
+        "free_space_path_loss": {"d_km": ["d"], "f_MHz": ["f"]},
+        "bpsk_ber": {"eb_n0_linear": ["eb_n0_db"]},
+    }
+    upgraded["required_variables"] = [{"name": name, "quantity": quantity, "canonical_unit": unit, "accepted_aliases": runtime_aliases.get(formula_id, {}).get(name, [])} for name, quantity, unit in variable_names[formula_id]]
     quantity, unit = outputs[formula_id]
     upgraded["output"] = {"quantity": quantity, "canonical_unit": unit}
     upgraded["applicability_conditions"] = []

@@ -1,71 +1,49 @@
-# Applicability-QA-Lab
+# FAVE-Med / Applicability-QA-Lab
 
-FAVE-RAG의 증거 적용 가능성 검증과 DeMo-Med의 공식 분해·검증·결정론적 실행을 하나의 정량 QA 실험 프레임워크로 재구성한 프로젝트입니다. 원본 저장소와 원본 데이터는 수정하지 않습니다.
+Cross-domain quantitative QA research framework for Telecom and Medical calculations. The primary research target is evidence that is relevant and factually true but unusable for the current computation because units, variable bindings, conditions, conventions, or approximation ranges do not match.
 
-> The 10-item experiment is a feasibility pilot, not a definitive benchmark result.
-> Executor-based historical methods use an oracle formula and therefore measure
-> variable extraction plus deterministic execution under an upper-bound condition.
-> Primary thesis results must use predicted-formula methods with no gold formula,
-> answer, variable annotation, or evidence labels in runtime inputs.
+## Research status
 
-## 연구 질문
+| Area | Status |
+|---|---|
+| Runtime/gold separation and leakage tests | implemented, integration-tested |
+| Telecom/Medical deterministic executors | implemented, integration-tested |
+| Strict structured output and evaluator statistics | implemented, integration-tested |
+| GPT-5.4 Telecom three-item run | real-model-piloted |
+| Typed FAVE-DeMo | under implementation |
+| Human annotations | not human-reviewed |
+| Telecom/Medical test benchmarks | not benchmark-frozen |
+| Primary thesis experiment | not experiment-completed |
+| Paper claims | not paper-ready |
 
-증거 검증과 단계별 계산을 결합했을 때 정량 QA의 정확성과 강건성이 얼마나 개선되는지 비교합니다.
+The historical Telecom seed and mock scores are engineering fixtures. Oracle formula/calculator methods are upper bounds and are never primary results.
 
-## 구조와 방법
+## Supported deterministic rules
 
-`core`는 공통 스키마·파서·단위·지표를, `domains`는 telecom/medical 어댑터와 계산기를, `pipelines`는 LLM-only, Vanilla RAG, FAVE, DeMo, FAVE-DeMo를 담당합니다. 모든 결과는 동일한 JSONL 구조로 저장됩니다.
+Telecom currently has ten seed executors. Medical has ten exact-ID executors: BMI, MAP, anion gap, Cockcroft-Gault, corrected calcium, Mosteller BSA, serum osmolality, FENa, Bazett QTc, and MELD-Na.
 
-## 설치
-
-Python 3.11 이상 설치 후 프로젝트 루트에서 실행합니다.
+## Setup and verification
 
 ```powershell
 py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
 python -m pip install -e .
 pytest -q
 ```
 
-## 데이터 준비와 실험
-
-기본 config는 비용 없는 mock provider를 사용합니다. 실제 호출 시 provider를 `openai`로 바꾸고 `.env`에 키를 설정합니다.
+## Reproducible smoke runs
 
 ```powershell
-python -m applicability_qa.cli.prepare --config configs/experiments/telecom_pilot.yaml
-python -m applicability_qa.cli.run --config configs/experiments/telecom_pilot.yaml --method llm_only
-python -m applicability_qa.cli.evaluate --config configs/experiments/telecom_pilot.yaml
+python -m applicability_qa.cli.run --config configs/experiments/telecom_end_to_end_mock_v3.yaml
+python -m applicability_qa.cli.evaluate --config configs/experiments/telecom_end_to_end_mock_v3.yaml
 ```
 
-Gold leakage가 차단된 v0.3 predicted-formula smoke와 별도 BM25 retrieval track은 다음처럼 실행합니다.
+The tracked real-API pilot summary is in `reports/telecom/openai_3_gpt54_v4_20260716/`. Raw outputs and `.env` are ignored. Never put an API key in source control.
 
-```powershell
-python -m applicability_qa.cli.run --config configs/experiments/telecom_seed_smoke_v2.yaml --max-items 3
-python -m applicability_qa.cli.evaluate --config configs/experiments/telecom_seed_smoke_v2.yaml
-
-python -m applicability_qa.cli.run --config configs/experiments/telecom_retrieval_seed_v2.yaml --max-items 3
-python -m applicability_qa.cli.evaluate --config configs/experiments/telecom_retrieval_seed_v2.yaml
-```
-
-Controlled-context track은 고정 evidence set으로 applicability 능력을 분리 측정합니다. Retrieval track은 별도 corpus에서 BM25 top-k를 검색하며 controlled evidence를 검색 결과로 위장하지 않습니다.
-
-일부 문항만 실행하려면 `--max-items 1` 또는 `--max-items 3`을 사용합니다. Mock 검증 후 OpenAI 3문항 실험은 다음 config로 준비되어 있습니다.
-
-```powershell
-python -m applicability_qa.cli.run --config configs/experiments/telecom_openai_3.yaml --max-items 3
-python -m applicability_qa.cli.evaluate --config configs/experiments/telecom_openai_3.yaml
-```
-
-평가는 answer accuracy, parse success, abstention을 공통 산출하며 telecom 증거 지표와 medical 실행 지표는 후속 확장 지점입니다. 현재 결정론적 실행기는 Shannon/Friis/FSPL과 BMI/MAP/anion gap을 우선 지원합니다.
-
-## 한계와 향후 계획
-
-현재는 1차 통합 골격과 pilot 실행 범위입니다. 전체 의료 계산기, telecom 공식, evidence precision/recall/F1, 통계 검정, combined report를 순차 확장해야 합니다. 실제 실험 결과는 모델과 prompt version을 고정한 뒤 작성합니다.
-
-## 출처
-
-This repository integrates and refactors components from:
+## Source projects
 
 - FAVE-RAG: https://github.com/Seongmiin2/FAVE-RAG
 - DeMo-Med: https://github.com/Seongmiin2/DeMo-Med
+- MedCalc-Bench-Verified pin and attribution: `data/medical/MEDCALC_BENCH_VERIFIED_PIN.md`
+
+This project evaluates calculator tool use and is not a clinical decision system.

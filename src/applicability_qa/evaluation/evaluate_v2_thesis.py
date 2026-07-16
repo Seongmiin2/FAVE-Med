@@ -54,6 +54,8 @@ def evaluate_record(record: BenchmarkRecord, prediction: dict | RunRecord) -> di
         "formula_correct": formula_correct, "formula_in_top3": record.gold.formula_id in candidates[:3],
         "formula_rank": candidates.index(record.gold.formula_id) + 1 if record.gold.formula_id in candidates else None,
         "retrieval_hit": retrieval_hit, "conflict_pairs": conflict_pairs,
+        "typed_gate_allowed": None if run.execution_gate is None else run.execution_gate.allowed,
+        "typed_blocking_failures": sum(not check.passed and check.blocking for decision in run.typed_applicability_decisions for check in decision.checks),
     }
     result["primary_error"] = primary_error(run.model_dump(), correct=result["correct"], parsed=result["parsed"], formula_correct=formula_correct, retrieval_hit=retrieval_hit)
     return result
@@ -74,6 +76,7 @@ def summarize_records(rows: list[dict]) -> dict:
         conflict_scores[label] = precision_recall_f1(tp, fp, fn)["f1"]
     formula_rows = [row for row in rows if row["formula_correct"] is not None]
     retrieval_rows = [row for row in rows if row["retrieval_hit"] is not None]
+    gate_rows = [row for row in rows if row["typed_gate_allowed"] is not None]
     return {
         "n": len(rows), "accuracy": safe_div(sum(row["correct"] for row in rows), len(rows)),
         "parse_success_rate": safe_div(sum(row["parsed"] for row in rows), len(rows)),
@@ -86,5 +89,7 @@ def summarize_records(rows: list[dict]) -> dict:
         "formula_recall_at_3": safe_div(sum(row["formula_in_top3"] for row in formula_rows), len(formula_rows)),
         "formula_mrr": safe_div(sum(1 / row["formula_rank"] if row["formula_rank"] else 0 for row in formula_rows), len(formula_rows)),
         "relevant_source_recall_at_k": safe_div(sum(row["retrieval_hit"] for row in retrieval_rows), len(retrieval_rows)),
+        "typed_gate_allowance_rate": safe_div(sum(row["typed_gate_allowed"] for row in gate_rows), len(gate_rows)),
+        "typed_blocking_failures": sum(row["typed_blocking_failures"] for row in rows),
         "error_counts": dict(Counter(row["primary_error"] or "none" for row in rows)),
     }

@@ -29,21 +29,25 @@
 - Added Medical v0.3 runtime/gold separation, patient-note prompt inclusion, ten typed calculator specifications, ten exact-ID executors, calculator selection, applicability cards, and five mock pipeline methods.
 - Created a non-gold Medical selection manifest with 20 development and 100 test candidates across ten families.
 - Completed a real GPT-5.4 snapshot Telecom 3-item pilot over five methods after strict-schema and usage-accounting fixes.
+- Added typed requirement/evidence signatures, deterministic compatibility checks, solution plans, execution gates, and post-execution validation.
+- Connected the typed gate to Telecom and Medical predicted-executor paths without exposing evaluator gold at runtime.
+- Added explicitly named comparison proxy baselines and offline minimal-pair, difficulty, and benchmark-track helpers.
 
 ## Validation
 
 - Historical pilot tests remain supported.
-- `pytest`: 42 passed, including dual-domain leakage, strict parsing, exact dispatch, statistics, and end-to-end mock coverage.
+- `pytest`: 48 passed, including dual-domain leakage, typed mismatch gates, post-validation, benchmark tools, strict parsing, exact dispatch, statistics, and end-to-end mock coverage.
+- `pip install -e .`: passed after build dependencies were available.
 - Mock end-to-end smoke completed four methods over all ten seed items; these fixture results are not model-performance evidence.
 - Real API v4 pilot produced 15 records through 21 calls with zero parse/execution failures; 4,912 input and 3,362 output tokens cost an estimated USD 0.06271.
 - Formula retrieval selects the correct registry formula for all ten seed questions without reading `GoldAnnotation`.
 - Mock smoke produced six successful predicted-mode records (two methods × three items) in a new `seed_smoke_v2` directory, with zero abstentions.
-- No paid API call was made for this refactor.
 - Retrieval smoke produced six records with retrieval provenance and relevant-source Recall@5 of 1.0.
 
 ## Remaining risks
 
-- The evaluator is transitional: formula and relevant-source metrics are wired, but error taxonomy and conflict-type macro F1 remain incomplete.
+- Typed signatures currently derive claim-level variable attribution from accepted runtime context; passage-level extraction and condition parsing need stronger structured parsers.
+- Named comparison methods are controlled proxy baselines, not exact reproductions of external repositories.
 - Formula retrieval remains a deterministic lexical baseline; evidence retrieval now uses BM25.
 - Full intermediate-call accounting is implemented for the new FAVE predicted/retrieval paths but not every historical pilot method.
 - The benchmark remains a ten-item seed set; no thesis test claim is supported.
@@ -56,10 +60,10 @@
 
 ## Next action
 
-1. Add error taxonomy, conflict-type macro F1, paired bootstrap, and Holm correction.
-2. Independently annotate two review-sheet copies, compute agreement, and adjudicate disagreements.
-3. Verify source-paper licenses and collect the 21 missing candidates from eligible primary sources.
-4. Adapt accepted candidates into `BenchmarkItem`, independently recompute answers/units, and freeze reviewed splits.
+1. Replace claim-level signature attribution with passage-level structured extraction and condition predicates.
+2. Build reviewed development sets, then freeze independently reviewed test sets.
+3. Validate proxy baselines and, where licensing permits, add faithful external-method reproductions.
+4. Run the pre-registered two-model experiment only after benchmark freeze.
 
 ## Candidate collection commands
 

@@ -4,6 +4,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from .signatures import EvidenceSignature, ExecutionGate, PostValidationResult, RequirementSignature, SolutionPlan, TypedApplicabilityDecision
+
 
 class GoldAnswer(BaseModel):
     value: Any
@@ -215,3 +217,9 @@ class RunRecord(BaseModel):
     raw_response: dict[str, Any] = Field(default_factory=dict)
     accepted_evidence_ids: list[str] = Field(default_factory=list)
     rejected_evidence_ids: list[str] = Field(default_factory=list)
+    requirement_signature: RequirementSignature | None = None
+    evidence_signatures: list[EvidenceSignature] = Field(default_factory=list)
+    typed_applicability_decisions: list[TypedApplicabilityDecision] = Field(default_factory=list)
+    solution_plan: SolutionPlan | None = None
+    execution_gate: ExecutionGate | None = None
+    post_validation: PostValidationResult | None = None

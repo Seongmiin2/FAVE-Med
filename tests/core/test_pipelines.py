@@ -9,6 +9,8 @@ REQUIRED = {
     "extracted_variables", "verification", "execution", "usage", "raw_response",
     "experiment_id", "schema_version", "evaluator_version", "formula_mode",
     "is_primary_result", "retrieval", "evidence_decisions", "formula_selection",
+    "requirement_signature", "evidence_signatures", "typed_applicability_decisions",
+    "solution_plan", "execution_gate", "post_validation",
 }
 
 
