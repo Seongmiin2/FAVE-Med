@@ -16,6 +16,11 @@ def main():
     args = parser.parse_args()
     config, root = load_config(args.config)
     items = {item.id: item for item in load_items(config, root)}
+    records = {}
+    if config["domain"] == "telecom":
+        from ..domains.telecom.adapter import load_telecom_records
+
+        records = {record.runtime.id: record for record in load_telecom_records(str(root / config["input_path"]))}
     evaluator = __import__(f"applicability_qa.domains.{config['domain']}.evaluator", fromlist=["evaluate"]).evaluate
     result_dir = root / config["result_dir"]
     result_dir.mkdir(parents=True, exist_ok=True)
@@ -55,10 +60,27 @@ def main():
                             trap_hits += 1
                             break
             prf = precision_recall_f1(tp, fp, fn)
-            summaries.append({"method": path.stem, "n": len(method_rows), "accuracy": sum(r["correct"] for r in method_rows) / len(method_rows), "parse_success_rate": sum(r["parsed"] for r in method_rows) / len(method_rows), "abstention_rate": sum(r["abstain"] for r in method_rows) / len(method_rows), "trap_hit_rate": trap_hits / len(method_rows), "invalid_evidence_precision": prf["precision"], "invalid_evidence_recall": prf["recall"], "invalid_evidence_f1": prf["f1"], "valid_evidence_false_rejection_rate": false_rejected / valid_total if valid_total else 0.0, "errors": dict(errors)})
+            formula_total = formula_top1 = formula_top3 = reciprocal_rank = 0
+            retrieval_total = retrieval_hits = 0
+            for item_id, prediction in predictions.items():
+                record = records.get(item_id)
+                if not record:
+                    continue
+                selection = prediction.get("formula_selection")
+                if selection:
+                    formula_total += 1
+                    candidates = selection.get("candidate_formula_ids", [])
+                    formula_top1 += int(selection.get("predicted_formula_id") == record.gold.formula_id)
+                    formula_top3 += int(record.gold.formula_id in candidates[:3])
+                    reciprocal_rank += 1 / (candidates.index(record.gold.formula_id) + 1) if record.gold.formula_id in candidates else 0
+                retrieval = prediction.get("retrieval")
+                if retrieval:
+                    retrieval_total += 1
+                    retrieval_hits += int(any(row.get("source_id") == record.gold.formula_id for row in retrieval.get("results", [])))
+            summaries.append({"method": path.stem, "n": len(method_rows), "accuracy": sum(r["correct"] for r in method_rows) / len(method_rows), "parse_success_rate": sum(r["parsed"] for r in method_rows) / len(method_rows), "abstention_rate": sum(r["abstain"] for r in method_rows) / len(method_rows), "trap_hit_rate": trap_hits / len(method_rows), "invalid_evidence_precision": prf["precision"], "invalid_evidence_recall": prf["recall"], "invalid_evidence_f1": prf["f1"], "valid_evidence_false_rejection_rate": false_rejected / valid_total if valid_total else 0.0, "formula_accuracy_at_1": formula_top1 / formula_total if formula_total else 0.0, "formula_recall_at_3": formula_top3 / formula_total if formula_total else 0.0, "formula_mrr": reciprocal_rank / formula_total if formula_total else 0.0, "relevant_source_recall_at_k": retrieval_hits / retrieval_total if retrieval_total else 0.0, "errors": dict(errors)})
     write_jsonl(result_dir / "per_item.jsonl", details)
     with (result_dir / "summary.csv").open("w", newline="", encoding="utf-8") as stream:
-        writer = csv.DictWriter(stream, fieldnames=["method", "n", "accuracy", "parse_success_rate", "abstention_rate", "trap_hit_rate", "invalid_evidence_precision", "invalid_evidence_recall", "invalid_evidence_f1", "valid_evidence_false_rejection_rate"])
+        writer = csv.DictWriter(stream, fieldnames=["method", "n", "accuracy", "parse_success_rate", "abstention_rate", "trap_hit_rate", "invalid_evidence_precision", "invalid_evidence_recall", "invalid_evidence_f1", "valid_evidence_false_rejection_rate", "formula_accuracy_at_1", "formula_recall_at_3", "formula_mrr", "relevant_source_recall_at_k"])
         writer.writeheader()
         writer.writerows({key: row[key] for key in writer.fieldnames} for row in summaries)
     lines = [f"# {config['experiment_name']} report", "", "| Method | N | Accuracy | Parse success | Trap hit | Invalid evidence F1 | Valid false rejection |", "|---|---:|---:|---:|---:|---:|---:|"]

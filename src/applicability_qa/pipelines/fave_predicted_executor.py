@@ -4,7 +4,7 @@ from ..domains.telecom.formula_executor import execute
 from ..domains.telecom.formula_registry import formula_by_id, load_formula_registry
 from ..domains.telecom.formula_selector import select_formula
 from ..domains.telecom.validity_checker import classify_evidence
-from .common import normalize
+from .common import merge_usage, normalize
 from .fave_demo import EXTRACTION_SYSTEM
 
 
@@ -21,6 +21,7 @@ def run_fave_predicted_executor(item, provider, config):
         formula = formula_by_id(selection["predicted_formula_id"], registry)
         generated = provider.generate_json(EXTRACTION_SYSTEM, f"Formula: {formula['expression']}\nQuestion: {item.question}\nApplicable evidence:\n{evidence_text}")
         raw.update(generated)
+        raw["usage"] = merge_usage(classification.usage, generated.get("usage", {}))
         try:
             value, unit = execute(formula["executor_name"], raw.get("extracted_variables", {}))
             raw.update(answer={"final_value": value, "final_unit": unit}, execution={"mode": "python", "success": True, "error": None})

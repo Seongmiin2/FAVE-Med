@@ -7,6 +7,8 @@ REQUIRED = {
     "id", "domain", "method", "model", "prompt_version", "answer", "abstain",
     "abstain_reason", "accepted_evidence_ids", "rejected_evidence_ids",
     "extracted_variables", "verification", "execution", "usage", "raw_response",
+    "experiment_id", "schema_version", "evaluator_version", "formula_mode",
+    "is_primary_result", "retrieval", "evidence_decisions", "formula_selection",
 }
 
 

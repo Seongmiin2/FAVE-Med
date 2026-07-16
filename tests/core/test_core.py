@@ -1,6 +1,6 @@
 from applicability_qa.core.answer_parser import evaluate_answer
 from applicability_qa.core.jsonl_utils import read_jsonl, write_jsonl
-from applicability_qa.core.schemas import BenchmarkItem, GoldAnswer
+from applicability_qa.core.schemas import BenchmarkItem, GoldAnswer, RunRecord
 from applicability_qa.pipelines.common import normalize
 
 
@@ -41,3 +41,9 @@ def test_semantic_unit_aliases():
             "telecom",
         )
         assert result["correct"]
+
+
+def test_v03_run_record_contract():
+    record = RunRecord(id="1", experiment_id="smoke", domain="telecom", method="llm_only", prompt_version="v2")
+    assert record.schema_version == "0.3"
+    assert record.answer == {"final_value": None, "final_unit": None}

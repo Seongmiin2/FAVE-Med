@@ -94,3 +94,53 @@ class EvidenceDecision(BaseModel):
 class EvidenceClassificationResult(BaseModel):
     decisions: list[EvidenceDecision]
     usage: dict[str, Any] = Field(default_factory=dict)
+
+
+class RetrievedEvidence(BaseModel):
+    evidence_id: str
+    text: str
+    score: float
+    rank: int
+    source_id: str
+    source_type: str
+
+
+class RetrievalRecord(BaseModel):
+    query: str
+    top_k: int
+    results: list[RetrievedEvidence] = Field(default_factory=list)
+
+
+class FormulaSelectionRecord(BaseModel):
+    predicted_formula_id: str | None = None
+    candidate_formula_ids: list[str] = Field(default_factory=list)
+    confidence: float = 0.0
+    reason: str = ""
+    abstain: bool = False
+    abstain_reason: str | None = None
+
+
+class RunRecord(BaseModel):
+    id: str
+    experiment_id: str
+    domain: Literal["telecom", "medical"]
+    method: str
+    model: str | None = None
+    prompt_version: str
+    schema_version: str = "0.3"
+    evaluator_version: str = "v2"
+    formula_mode: Literal["none", "oracle", "predicted"] = "none"
+    is_primary_result: bool = True
+    answer: dict[str, Any] = Field(default_factory=lambda: {"final_value": None, "final_unit": None})
+    abstain: bool = False
+    abstain_reason: str | None = None
+    retrieval: RetrievalRecord | None = None
+    evidence_decisions: list[EvidenceDecision] = Field(default_factory=list)
+    formula_selection: FormulaSelectionRecord | None = None
+    extracted_variables: dict[str, Any] = Field(default_factory=dict)
+    verification: dict[str, Any] = Field(default_factory=dict)
+    execution: dict[str, Any] = Field(default_factory=dict)
+    usage: dict[str, Any] = Field(default_factory=dict)
+    raw_response: dict[str, Any] = Field(default_factory=dict)
+    accepted_evidence_ids: list[str] = Field(default_factory=list)
+    rejected_evidence_ids: list[str] = Field(default_factory=list)

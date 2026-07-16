@@ -6,6 +6,15 @@ from ..core.schemas import BenchmarkItem
 SYSTEM = "Return one JSON object with answer.final_value and answer.final_unit. Never substitute an intermediate value for final_value."
 
 
+def merge_usage(*records: dict) -> dict:
+    keys = ("input_tokens", "output_tokens", "latency_seconds")
+    merged = {key: sum(float(record.get(key, 0) or 0) for record in records) for key in keys}
+    merged["input_tokens"] = int(merged["input_tokens"])
+    merged["output_tokens"] = int(merged["output_tokens"])
+    merged["total_calls"] = sum(int(record.get("total_calls", 1 if record else 0)) for record in records)
+    return merged
+
+
 def context(item: BenchmarkItem, ids: list[str] | None = None) -> str:
     chosen = item.evidence if ids is None else [e for e in item.evidence if e.id in ids]
     return "\n".join(f"- {e.id}: {e.text}" for e in chosen)
