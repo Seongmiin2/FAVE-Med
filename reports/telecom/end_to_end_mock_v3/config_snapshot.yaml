@@ -1,0 +1,8 @@
+experiment_name: telecom_end_to_end_mock_v3
+domain: telecom
+input_path: data/telecom/benchmark/fave_bench_10.jsonl
+evaluator_version: v2
+model: {provider: mock, name: mock, temperature: 0}
+retrieval: {method: bm25, top_k: 5, corpus_path: data/telecom/corpus/evidence_corpus_seed.jsonl}
+runtime: {seed: 42, strict_structured_output: false}
+statistics: {bootstrap_resamples: 10000, seed: 42}

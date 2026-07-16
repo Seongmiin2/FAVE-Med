@@ -6,6 +6,7 @@ from pathlib import Path
 from ...core.schemas import (
     EvidenceClassificationResult, EvidenceDecision, RuntimeEvidence, RuntimeQuestion,
 )
+from ...core.errors import StructuredOutputError
 
 PROMPT_PATH = Path(__file__).resolve().parents[4] / "configs" / "prompts" / "telecom" / "applicability_v2.txt"
 
@@ -14,10 +15,12 @@ def classify_evidence(
     item: RuntimeQuestion,
     evidence: list[RuntimeEvidence],
     provider,
+    strict: bool = False,
 ) -> EvidenceClassificationResult:
     system = PROMPT_PATH.read_text(encoding="utf-8")
     payload = {
         "question": item.question,
+        "patient_note": getattr(item, "patient_note", None),
         "requested_output": item.requested_output,
         "explicit_information": item.metadata.get("explicit_information", []),
         "candidate_evidence": [row.model_dump() for row in evidence],
@@ -25,6 +28,8 @@ def classify_evidence(
     raw = provider.generate_json(system, json.dumps(payload, ensure_ascii=False))
     decisions = raw.get("decisions")
     if decisions is None:
+        if strict:
+            raise StructuredOutputError("classifier_parse_failure", "Classifier output is missing decisions")
         accepted = set(raw.get("accepted_evidence_ids", []))
         rejected = set(raw.get("rejected_evidence_ids", []))
         decisions = [
@@ -39,9 +44,15 @@ def classify_evidence(
             for row in evidence
         ]
     by_id = {row.id for row in evidence}
-    parsed = [EvidenceDecision.model_validate(row) for row in decisions]
+    try:
+        parsed = [EvidenceDecision.model_validate(row) for row in decisions]
+    except Exception as exc:
+        raise StructuredOutputError("classifier_parse_failure", f"Invalid classifier decision schema: {exc}") from exc
+    decision_ids = [row.evidence_id for row in parsed]
+    if len(decision_ids) != len(set(decision_ids)):
+        raise StructuredOutputError("classifier_parse_failure", "Classifier returned duplicate evidence IDs")
     if {row.evidence_id for row in parsed} != by_id:
-        raise ValueError("Classifier must return exactly one decision per evidence item")
+        raise StructuredOutputError("classifier_parse_failure", "Classifier must return exactly one decision per evidence item")
     return EvidenceClassificationResult(decisions=parsed, usage=raw.get("usage", {}))
 
 

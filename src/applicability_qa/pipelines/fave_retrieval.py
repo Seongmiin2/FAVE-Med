@@ -12,7 +12,7 @@ def run_fave_retrieval(item, provider, config):
     retrieved = BM25Retriever(corpus).retrieve(item.question, top_k)
     runtime_evidence = [RuntimeEvidence(id=row.evidence_id, text=row.text) for row in retrieved]
     runtime = RuntimeQuestion(id=item.id, domain=item.domain, question=item.question, requested_output=item.requested_output, evidence=runtime_evidence, metadata=item.metadata)
-    classification = classify_evidence(runtime, runtime_evidence, provider)
+    classification = classify_evidence(runtime, runtime_evidence, provider, strict=config.get("runtime", {}).get("strict_structured_output", False))
     accepted = {row.evidence_id for row in classification.decisions if row.label == "valid"}
     text = "\n".join(f"- {row.evidence_id}: {row.text}" for row in retrieved if row.evidence_id in accepted)
     raw = provider.generate_json(SYSTEM, f"Question: {item.question}\nApplicable retrieved evidence:\n{text}")

@@ -22,3 +22,12 @@ methods:
 runtime:
   seed: 42
   resume: false
+  strict_structured_output: false
+statistics:
+  bootstrap_resamples: 10000
+  seed: 42
+  comparisons:
+    - a: vanilla_retrieval_rag
+      b: fave_retrieval
+    - a: vanilla_retrieval_predicted_executor
+      b: fave_retrieval_predicted_executor

@@ -1,0 +1,20 @@
+{"evidence_id":"med_bmi_valid","text":"BMI is weight in kilograms divided by height in meters squared.","source_id":"body_mass_index","source_type":"project_formula_card"}
+{"evidence_id":"med_bmi_trap","text":"BMI uses height in centimeters directly without conversion.","source_id":"body_mass_index_trap","source_type":"controlled_distractor"}
+{"evidence_id":"med_map_valid","text":"MAP is approximated as systolic pressure plus twice diastolic pressure, divided by three.","source_id":"mean_arterial_pressure","source_type":"project_formula_card"}
+{"evidence_id":"med_map_trap","text":"MAP is the simple average of systolic and diastolic pressure.","source_id":"mean_arterial_pressure_trap","source_type":"controlled_distractor"}
+{"evidence_id":"med_ag_valid","text":"The potassium-excluding anion gap is sodium minus chloride minus bicarbonate.","source_id":"anion_gap","source_type":"project_formula_card"}
+{"evidence_id":"med_ag_trap","text":"Always add potassium when calculating the anion gap.","source_id":"anion_gap_trap","source_type":"controlled_distractor"}
+{"evidence_id":"med_cg_valid","text":"Cockcroft-Gault uses age, weight, serum creatinine and a 0.85 female coefficient.","source_id":"cockcroft_gault","source_type":"project_formula_card"}
+{"evidence_id":"med_cg_trap","text":"Cockcroft-Gault does not require sex or a sex coefficient.","source_id":"cockcroft_gault_trap","source_type":"controlled_distractor"}
+{"evidence_id":"med_ca_valid","text":"Conventional corrected calcium adds 0.8 times four minus albumin to measured calcium.","source_id":"corrected_calcium","source_type":"project_formula_card"}
+{"evidence_id":"med_ca_trap","text":"Corrected calcium subtracts the albumin correction term.","source_id":"corrected_calcium_trap","source_type":"controlled_distractor"}
+{"evidence_id":"med_bsa_valid","text":"Mosteller BSA is the square root of height in cm times weight in kg divided by 3600.","source_id":"body_surface_area_mosteller","source_type":"project_formula_card"}
+{"evidence_id":"med_bsa_trap","text":"Mosteller BSA divides height times weight by 3600 without taking a square root.","source_id":"body_surface_area_mosteller_trap","source_type":"controlled_distractor"}
+{"evidence_id":"med_osm_valid","text":"Calculated serum osmolality is twice sodium plus glucose divided by 18 plus BUN divided by 2.8.","source_id":"serum_osmolality","source_type":"project_formula_card"}
+{"evidence_id":"med_osm_trap","text":"Serum osmolality uses glucose and BUN without conventional-unit divisors.","source_id":"serum_osmolality_trap","source_type":"controlled_distractor"}
+{"evidence_id":"med_fena_valid","text":"FENa percent is 100 times urine sodium times plasma creatinine divided by plasma sodium times urine creatinine.","source_id":"fractional_excretion_sodium","source_type":"project_formula_card"}
+{"evidence_id":"med_fena_trap","text":"FENa swaps urine and plasma creatinine in the ratio.","source_id":"fractional_excretion_sodium_trap","source_type":"controlled_distractor"}
+{"evidence_id":"med_qtc_valid","text":"Bazett QTc divides QT in seconds by the square root of RR in seconds.","source_id":"qtc_bazett","source_type":"project_formula_card"}
+{"evidence_id":"med_qtc_trap","text":"Bazett QTc multiplies QT by the square root of RR.","source_id":"qtc_bazett_trap","source_type":"controlled_distractor"}
+{"evidence_id":"med_meld_valid","text":"MELD-Na applies standard sodium and MELD clamps before the sodium correction.","source_id":"meld_na","source_type":"project_formula_card"}
+{"evidence_id":"med_meld_trap","text":"MELD-Na never clamps sodium or the base MELD score.","source_id":"meld_na_trap","source_type":"controlled_distractor"}

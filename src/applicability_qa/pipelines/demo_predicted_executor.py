@@ -3,7 +3,7 @@ from __future__ import annotations
 from ..domains.telecom.formula_executor import execute
 from ..domains.telecom.formula_registry import formula_by_id, load_formula_registry
 from ..domains.telecom.formula_selector import select_formula
-from .common import normalize
+from .common import normalize, validate_extraction
 from .demo_multi_executor import EXTRACTION_SYSTEM
 
 
@@ -16,6 +16,7 @@ def run_demo_predicted_executor(item, provider, config):
     else:
         formula = formula_by_id(selection["predicted_formula_id"], registry)
         raw = provider.generate_json(EXTRACTION_SYSTEM, f"Formula: {formula.expression}\nQuestion: {item.question}\nContext:\n{evidence_text}")
+        validate_extraction(raw, config.get("runtime", {}).get("strict_structured_output", False))
         try:
             value, unit = execute(formula.executor_name, raw.get("extracted_variables", {}))
             raw.update(answer={"final_value": value, "final_unit": unit}, execution={"mode": "python", "success": True, "error": None})

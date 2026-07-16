@@ -21,11 +21,18 @@
 - Removed runtime derivation from `gold_unit`, added question-only requested-output extraction, and strengthened leakage tests.
 - Added typed formula-registry models, exact-ID executor dispatch, physical input checks, and enforced `RunRecord` validation.
 - Added the two complete retrieval-to-predicted-executor methods required by the roadmap.
+- Added strict classifier, selector, and variable-extraction schema failure codes with abstention in thesis mode.
+- Split legacy compatibility evaluation from a GoldAnnotation-only thesis evaluator.
+- Added primary error taxonomy, conflict-type Macro F1, exact McNemar, paired bootstrap CI, and Holm correction.
+- Added tracked `reports/` summaries while keeping raw outputs and local results ignored.
+- Pinned MedCalc-Bench-Verified at revision `591157b3343b4dda247294f9d929da4c75026fa8` with CC BY-SA 4.0 attribution and local SHA-256 verification.
+- Added Medical v0.3 runtime/gold separation, patient-note prompt inclusion, ten typed calculator specifications, ten exact-ID executors, calculator selection, applicability cards, and five mock pipeline methods.
+- Created a non-gold Medical selection manifest with 20 development and 100 test candidates across ten families.
 
 ## Validation
 
 - Historical pilot tests remain supported.
-- `pytest`: 27 passed, including leakage, exact dispatch, candidate collection, and full retrieval-executor tests.
+- `pytest`: 42 passed, including dual-domain leakage, strict parsing, exact dispatch, statistics, and end-to-end mock coverage.
 - Mock end-to-end smoke completed four methods over all ten seed items; these fixture results are not model-performance evidence.
 - Formula retrieval selects the correct registry formula for all ten seed questions without reading `GoldAnnotation`.
 - Mock smoke produced six successful predicted-mode records (two methods × three items) in a new `seed_smoke_v2` directory, with zero abstentions.
@@ -42,6 +49,8 @@
 - The balanced collection target is short by 21 candidates: outage probability, Nyquist rate, MIMO capacity, and Eb/N0 relation need additional eligible sources.
 - The 129 candidates are not experiment-ready until source-paper license verification, quantitative adaptation, independent recomputation, and double review are complete.
 - Readiness audit found only 9 explicit calculation-worded candidates and only 3 that also have digit-bearing source answers; target a 180–200 raw pool rather than assuming only 21 more rows are needed.
+- Medical 20/100 rows are selection candidates only; deterministic consistency and medical review remain incomplete.
+- The Medical mock uses synthetic fixtures and is not evidence of clinical validity or model performance.
 
 ## Next action
 

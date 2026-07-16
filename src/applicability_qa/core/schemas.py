@@ -107,6 +107,52 @@ class BenchmarkRecord(BaseModel):
     gold: GoldAnnotation
 
 
+class MedicalRuntimeQuestion(BaseModel):
+    id: str
+    domain: Literal["medical"] = "medical"
+    patient_note: str
+    question: str
+    requested_output: str | None = None
+    evidence: list[RuntimeEvidence] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class MedicalGoldAnnotation(BaseModel):
+    answer: GoldAnswer
+    calculator_id: str
+    required_entities: dict[str, Any] = Field(default_factory=dict)
+    required_units: dict[str, str] = Field(default_factory=dict)
+    tolerance: dict[str, float | None] = Field(default_factory=dict)
+    applicability_conditions: list[str] = Field(default_factory=list)
+    evidence_annotations: list[EvidenceAnnotation] = Field(default_factory=list)
+
+
+class MedicalBenchmarkRecord(BaseModel):
+    schema_version: str = "0.3"
+    source: dict[str, Any] = Field(default_factory=dict)
+    runtime: MedicalRuntimeQuestion
+    gold: MedicalGoldAnnotation
+
+
+class CalculatorEntitySpec(BaseModel):
+    name: str
+    canonical_unit: str
+    accepted_aliases: list[str] = Field(default_factory=list)
+
+
+class MedicalCalculatorSpec(BaseModel):
+    calculator_id: str
+    name: str
+    description: str
+    expression: str
+    required_entities: list[CalculatorEntitySpec]
+    applicability_conditions: list[str] = Field(default_factory=list)
+    unsupported_conditions: list[str] = Field(default_factory=list)
+    output: FormulaOutputSpec
+    aliases: list[str] = Field(default_factory=list)
+    executor_name: str
+
+
 class EvidenceDecision(BaseModel):
     evidence_id: str
     label: Literal["valid", "contested", "rejected"]

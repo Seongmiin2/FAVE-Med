@@ -1,6 +1,23 @@
 from __future__ import annotations
 
 from ..core.schemas import BenchmarkItem
+from ..core.errors import StructuredOutputError
+
+
+def validate_extraction(raw: dict, strict: bool) -> dict:
+    if not strict:
+        return raw
+    variables, verification = raw.get("extracted_variables"), raw.get("verification")
+    if not isinstance(variables, dict) or not isinstance(verification, dict):
+        raise StructuredOutputError("variable_extractor_parse_failure", "extracted_variables and verification must be objects")
+    if any(isinstance(value, (dict, list)) and key != "H" for key, value in variables.items()):
+        raise StructuredOutputError("variable_extractor_parse_failure", "Variable values must be scalar except supported matrices")
+    return raw
+
+
+def question_prompt(item) -> str:
+    patient_note = getattr(item, "patient_note", None)
+    return f"Patient note:\n{patient_note}\n\nQuestion:\n{item.question}" if patient_note is not None else f"Question: {item.question}"
 
 
 SYSTEM = "Return one JSON object with answer.final_value and answer.final_unit. Never substitute an intermediate value for final_value."

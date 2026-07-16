@@ -1,0 +1,5 @@
+method,n,accuracy,parse_success_rate,abstention_rate,trap_hit_rate,invalid_evidence_precision,invalid_evidence_recall,invalid_evidence_f1,valid_evidence_false_rejection_rate,conflict_type_macro_f1,formula_accuracy_at_1,formula_recall_at_3,formula_mrr,relevant_source_recall_at_k
+fave_retrieval,10,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0
+fave_retrieval_predicted_executor,10,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0
+vanilla_retrieval_predicted_executor,10,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0
+vanilla_retrieval_rag,10,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0
