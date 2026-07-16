@@ -7,6 +7,8 @@ ERROR_TYPES = {
     "answer_format_failure", "classifier_parse_failure", "selector_parse_failure",
     "formula_selector_parse_failure", "variable_extractor_parse_failure", "unsupported_rule",
     "unsupported_formula", "wrong_abstention", "missing_abstention", "other",
+    "requirement_signature_failure", "evidence_signature_failure",
+    "typed_execution_gate", "post_validation_failure",
 }
 
 

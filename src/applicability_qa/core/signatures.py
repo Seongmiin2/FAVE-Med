@@ -29,6 +29,9 @@ class RequirementSignature(BaseModel):
     convention: str | None = None
     approximation_policy: Literal["exact", "allowed", "required", "unspecified"] = "unspecified"
     physical_constraints: list[ConditionPredicate] = Field(default_factory=list)
+    formula_family_candidates: list[str] = Field(default_factory=list)
+    convention_tags: list[str] = Field(default_factory=list)
+    required_procedural_steps: list[str] = Field(default_factory=list)
 
 
 class EvidenceSignature(BaseModel):
@@ -40,12 +43,18 @@ class EvidenceSignature(BaseModel):
     convention: str | None = None
     approximation: bool | None = None
     source_type: str = "unknown"
+    asserted_formula_id: str | None = None
+    variable_units: dict[str, str] = Field(default_factory=dict)
+    convention_tags: list[str] = Field(default_factory=list)
+    procedural_steps: list[str] = Field(default_factory=list)
+    factuality_claim: Literal["verified", "unverified", "false"] = "unverified"
 
 
 class CompatibilityCheck(BaseModel):
     check_type: Literal[
         "unit", "variable_binding", "condition", "convention",
         "approximation", "physical_constraint", "variable_coverage",
+        "procedural_step",
     ]
     passed: bool
     blocking: bool = True
@@ -60,6 +69,9 @@ class TypedApplicabilityDecision(BaseModel):
     applicable: bool
     checks: list[CompatibilityCheck] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
+    decision: Literal["applicable", "conditionally_applicable", "inapplicable"] | None = None
+    blocking_failures: list[str] = Field(default_factory=list)
+    confidence: float = Field(default=1.0, ge=0, le=1)
 
 
 class SolutionPlan(BaseModel):

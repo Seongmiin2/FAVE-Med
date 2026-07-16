@@ -1,0 +1,26 @@
+schema_version: "1.0"
+methods:
+  crag:
+    paper: "Corrective Retrieval Augmented Generation"
+    repository: "https://github.com/HuskyInSalt/CRAG.git"
+    commit: "de7c2961ae624a1483a138c5798e1f6d0c4fb0e0"
+    license: "NO LICENSE FILE IN PINNED REPOSITORY"
+    faithful_run_requirements:
+      - trained T5-large retrieval evaluator checkpoint
+      - Llama-2 generator checkpoint
+      - Google Search API-compatible service and key
+      - original task data
+    local_method: crag_proxy
+    local_status: architecture_proxy_not_official_reproduction
+  medrac:
+    paper: "From Scores to Steps: Diagnosing and Improving LLM Performance in Evidence-Based Medical Calculations"
+    repository: "https://github.com/Super-Billy/EMNLP-2025-MedRaC.git"
+    commit: "900c54123ce03ca467ebdf0b2f28afb7dcaabc5e"
+    license: "Apache-2.0"
+    faithful_run_requirements:
+      - official cleaned MedCalc-Bench data
+      - official formula corpus
+      - configured embedding model
+      - configured generation model
+    local_method: medrac_proxy
+    local_status: architecture_proxy_not_official_reproduction

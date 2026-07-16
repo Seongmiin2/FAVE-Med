@@ -89,6 +89,7 @@ class EvidenceAnnotation(BaseModel):
     label: Literal["valid", "contested", "rejected"]
     conflict_type: ConflictType = "none"
     rationale: str | None = None
+    evidence_type: Literal["valid", "false", "true_but_inapplicable", "insufficient", "unknown"] = "unknown"
 
 
 class GoldAnnotation(BaseModel):

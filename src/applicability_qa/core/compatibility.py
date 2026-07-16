@@ -10,8 +10,9 @@ def _check(kind: str, passed: bool, code: str, message: str, evidence_id: str, b
 
 def check_unit(requirement: RequirementSignature, evidence: EvidenceSignature) -> CompatibilityCheck:
     observed = evidence.quantities.get(requirement.target_quantity)
-    passed = observed is None or observed == requirement.target_unit
-    return _check("unit", passed, "unit_ok" if passed else "unit_mismatch", f"target unit requires {requirement.target_unit}; observed {observed or 'unspecified'}", evidence.evidence_id, required=requirement.target_unit, observed=observed)
+    mismatches = {item.name: {"required": item.canonical_unit, "observed": evidence.variable_units[item.name]} for item in requirement.required_inputs if item.name in evidence.variable_units and evidence.variable_units[item.name] != item.canonical_unit}
+    passed = (observed is None or observed == requirement.target_unit) and not mismatches
+    return _check("unit", passed, "unit_ok" if passed else "unit_mismatch", f"target unit requires {requirement.target_unit}; observed {observed or 'unspecified'}; variable mismatches={mismatches}", evidence.evidence_id, required=requirement.target_unit, observed=observed, variable_mismatches=mismatches)
 
 
 def check_variable_coverage(requirement: RequirementSignature, evidence: EvidenceSignature) -> CompatibilityCheck:
@@ -24,13 +25,18 @@ def check_variable_coverage(requirement: RequirementSignature, evidence: Evidenc
 def check_conditions(requirement: RequirementSignature, evidence: EvidenceSignature) -> list[CompatibilityCheck]:
     checks = []
     for predicate in requirement.conditions:
+        if predicate.field not in evidence.facts:
+            checks.append(_check("condition", True, "condition_deferred", f"{predicate.field} will be checked against runtime inputs", evidence.evidence_id, predicate=predicate.model_dump()))
+            continue
         passed = evaluate_predicate(predicate, evidence.facts)
         checks.append(_check("condition", passed, "condition_ok" if passed else "condition_mismatch", predicate.description or f"{predicate.field} {predicate.operator} {predicate.value}", evidence.evidence_id, predicate=predicate.model_dump()))
     return checks
 
 
 def check_convention(requirement: RequirementSignature, evidence: EvidenceSignature) -> CompatibilityCheck:
-    passed = requirement.convention is None or evidence.convention is None or requirement.convention == evidence.convention
+    formula_ok = not requirement.formula_family_candidates or evidence.asserted_formula_id is None or evidence.asserted_formula_id in requirement.formula_family_candidates
+    tags_ok = not requirement.convention_tags or not evidence.convention_tags or bool(set(requirement.convention_tags) & set(evidence.convention_tags))
+    passed = formula_ok and tags_ok and (requirement.convention is None or evidence.convention is None or requirement.convention == evidence.convention)
     return _check("convention", passed, "convention_ok" if passed else "convention_mismatch", f"required {requirement.convention}; observed {evidence.convention}", evidence.evidence_id)
 
 
@@ -41,11 +47,25 @@ def check_approximation(requirement: RequirementSignature, evidence: EvidenceSig
 
 
 def check_physical_constraints(requirement: RequirementSignature, evidence: EvidenceSignature) -> list[CompatibilityCheck]:
-    return [_check("physical_constraint", (passed := evaluate_predicate(p, evidence.facts)), "physical_ok" if passed else "physical_constraint_violation", p.description or f"{p.field} {p.operator} {p.value}", evidence.evidence_id, predicate=p.model_dump()) for p in requirement.physical_constraints]
+    checks = []
+    for predicate in requirement.physical_constraints:
+        if predicate.field not in evidence.facts:
+            checks.append(_check("physical_constraint", True, "physical_deferred", f"{predicate.field} will be checked against runtime inputs", evidence.evidence_id, predicate=predicate.model_dump()))
+            continue
+        passed = evaluate_predicate(predicate, evidence.facts)
+        checks.append(_check("physical_constraint", passed, "physical_ok" if passed else "physical_constraint_violation", predicate.description or f"{predicate.field} {predicate.operator} {predicate.value}", evidence.evidence_id, predicate=predicate.model_dump()))
+    return checks
+
+
+def check_procedural_steps(requirement: RequirementSignature, evidence: EvidenceSignature) -> CompatibilityCheck:
+    missing = sorted(set(requirement.required_procedural_steps) - set(evidence.procedural_steps))
+    passed = not missing
+    return _check("procedural_step", passed, "procedure_ok" if passed else "procedural_step_mismatch", f"missing procedural steps: {missing}" if missing else "required procedural steps present", evidence.evidence_id, missing=missing)
 
 
 def verify_applicability(requirement: RequirementSignature, evidence: EvidenceSignature) -> TypedApplicabilityDecision:
-    checks = [check_unit(requirement, evidence), check_variable_coverage(requirement, evidence), *check_conditions(requirement, evidence), check_convention(requirement, evidence), check_approximation(requirement, evidence), *check_physical_constraints(requirement, evidence)]
+    checks = [check_unit(requirement, evidence), check_variable_coverage(requirement, evidence), *check_conditions(requirement, evidence), check_convention(requirement, evidence), check_approximation(requirement, evidence), *check_physical_constraints(requirement, evidence), check_procedural_steps(requirement, evidence)]
     applicable = not any(not item.passed and item.blocking for item in checks)
     warnings = [item.code for item in checks if not item.passed and not item.blocking]
-    return TypedApplicabilityDecision(evidence_id=evidence.evidence_id, applicable=applicable, checks=checks, warnings=warnings)
+    blocking = [item.code for item in checks if not item.passed and item.blocking]
+    return TypedApplicabilityDecision(evidence_id=evidence.evidence_id, applicable=applicable, decision="applicable" if applicable and not warnings else "conditionally_applicable" if applicable else "inapplicable", checks=checks, warnings=warnings, blocking_failures=blocking)

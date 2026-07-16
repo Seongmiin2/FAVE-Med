@@ -12,6 +12,7 @@ def requirement_from_formula(spec: Any) -> RequirementSignature:
         target_unit=spec.output.canonical_unit,
         required_inputs=[QuantityRequirement(name=row.name, quantity=getattr(row, "quantity", row.name), canonical_unit=row.canonical_unit, aliases=row.accepted_aliases) for row in inputs],
         approximation_policy="unspecified",
+        formula_family_candidates=[getattr(spec, "formula_id", None) or getattr(spec, "calculator_id")],
     )
 
 

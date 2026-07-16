@@ -20,6 +20,8 @@ from .medical_retrieval import run_medical_vanilla_retrieval, run_medical_fave_r
 from ..core.schemas import RunRecord
 from ..core.errors import StructuredOutputError
 from .baselines import run_crag_proxy, run_factuality_baseline, run_medical_factuality_baseline, run_medical_open_book, run_medrac_proxy, run_relevance_baseline
+from .typed_fave_retrieval_predicted_executor import run_typed_fave_retrieval_predicted_executor
+from .medical_typed_fave_retrieval_predicted_executor import run_medical_typed_fave_retrieval_predicted_executor
 
 PIPELINES = {"llm_only": run_llm_only, "cot": run_cot, "vanilla_rag": run_vanilla_rag, "fave": run_fave, "demo": run_demo, "fave_demo": run_fave_demo}
 PIPELINES.update({"fave_silent": run_fave, "demo_multi_executor": run_demo_multi_executor})
@@ -29,7 +31,9 @@ PIPELINES.update({"vanilla_retrieval_predicted_executor": run_vanilla_retrieval_
 PIPELINES.update({"medical_predicted_executor": run_medical_predicted_executor})
 PIPELINES.update({"medical_llm_only": run_llm_only})
 PIPELINES.update({"relevance_baseline": run_relevance_baseline, "factuality_baseline": run_factuality_baseline, "crag_proxy": run_crag_proxy})
+PIPELINES.update({"typed_fave_retrieval_predicted_executor": run_typed_fave_retrieval_predicted_executor, "typed_fave_demo": run_typed_fave_retrieval_predicted_executor})
 PIPELINES.update({"medical_open_book": run_medical_open_book, "medical_factuality_baseline": run_medical_factuality_baseline, "medrac_proxy": run_medrac_proxy})
+PIPELINES.update({"medical_typed_fave_retrieval_predicted_executor": run_medical_typed_fave_retrieval_predicted_executor, "medical_typed_fave_demo": run_medical_typed_fave_retrieval_predicted_executor})
 PIPELINES.update({"medical_vanilla_retrieval": run_medical_vanilla_retrieval, "medical_fave_retrieval": run_medical_fave_retrieval, "medical_retrieval_predicted_executor": run_medical_retrieval_predicted_executor, "medical_fave_retrieval_predicted_executor": run_medical_fave_retrieval_predicted_executor})
 
 

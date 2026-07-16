@@ -35,7 +35,7 @@ class MedicalSmokeProvider(MockProvider):
 
 def test_five_medical_methods_complete_ten_family_smoke():
     config = {"experiment_name": "medical_mock_v03", "schema_version": "0.3", "evaluator_version": "v2", "model": {"name": "mock"}, "runtime": {"strict_structured_output": True}, "retrieval": {"top_k": 5, "corpus_path": "data/medical/corpus/calculator_evidence_v0.3.jsonl"}}
-    methods = ("medical_llm_only", "medical_vanilla_retrieval", "medical_fave_retrieval", "medical_retrieval_predicted_executor", "medical_fave_retrieval_predicted_executor")
+    methods = ("medical_llm_only", "medical_vanilla_retrieval", "medical_fave_retrieval", "medical_retrieval_predicted_executor", "medical_fave_retrieval_predicted_executor", "medical_typed_fave_retrieval_predicted_executor")
     for marker, question, entities, calculator_id in CASES:
         item = MedicalRuntimeQuestion(id=marker, patient_note=f"Synthetic integration fixture with values {entities}.", question=question)
         for method in methods:
@@ -44,3 +44,6 @@ def test_five_medical_methods_complete_ten_family_smoke():
             if "predicted_executor" in method:
                 assert result.formula_selection.predicted_formula_id == calculator_id
                 assert result.execution["success"] is True
+            if "typed_fave" in method:
+                assert result.execution_gate and result.execution_gate.allowed
+                assert result.requirement_signature is not None

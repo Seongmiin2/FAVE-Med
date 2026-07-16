@@ -12,6 +12,10 @@ def evaluate_predicate(predicate: ConditionPredicate, facts: dict[str, Any]) -> 
     if not exists:
         return False
     actual, expected = facts[predicate.field], predicate.value
+    if isinstance(expected, dict) and set(expected) == {"field"}:
+        if expected["field"] not in facts:
+            return False
+        expected = facts[expected["field"]]
     operations = {
         "eq": lambda: actual == expected,
         "ne": lambda: actual != expected,

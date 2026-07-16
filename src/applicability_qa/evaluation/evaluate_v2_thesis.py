@@ -23,6 +23,8 @@ def evaluate_record(record: BenchmarkRecord, prediction: dict | RunRecord) -> di
     gold_by_id = {row.evidence_id: row for row in record.gold.evidence_annotations}
     predicted_by_id = {row.evidence_id: row for row in run.evidence_decisions}
     invalid_gold = {item for item, row in gold_by_id.items() if row.label == "rejected"}
+    true_inapplicable_gold = {item for item, row in gold_by_id.items() if row.evidence_type == "true_but_inapplicable"}
+    false_evidence_gold = {item for item, row in gold_by_id.items() if row.evidence_type == "false"}
     valid_gold = {item for item, row in gold_by_id.items() if row.label == "valid"}
     rejected = {item for item, row in predicted_by_id.items() if row.label == "rejected"}
     tp, fp, fn = len(invalid_gold & rejected), len(rejected - invalid_gold), len(invalid_gold - rejected)
@@ -56,6 +58,11 @@ def evaluate_record(record: BenchmarkRecord, prediction: dict | RunRecord) -> di
         "retrieval_hit": retrieval_hit, "conflict_pairs": conflict_pairs,
         "typed_gate_allowed": None if run.execution_gate is None else run.execution_gate.allowed,
         "typed_blocking_failures": sum(not check.passed and check.blocking for decision in run.typed_applicability_decisions for check in decision.checks),
+        "true_inapplicable_tp": len(true_inapplicable_gold & rejected), "true_inapplicable_total": len(true_inapplicable_gold),
+        "false_evidence_tp": len(false_evidence_gold & rejected), "false_evidence_total": len(false_evidence_gold),
+        "covered": not run.abstain, "unsafe_answer": not run.abstain and not answer["correct"],
+        "difficulty": record.runtime.metadata.get("difficulty", "unknown"),
+        "pair_id": record.runtime.metadata.get("pair_id"), "pair_role": record.runtime.metadata.get("pair_role"),
     }
     result["primary_error"] = primary_error(run.model_dump(), correct=result["correct"], parsed=result["parsed"], formula_correct=formula_correct, retrieval_hit=retrieval_hit)
     return result
@@ -77,6 +84,13 @@ def summarize_records(rows: list[dict]) -> dict:
     formula_rows = [row for row in rows if row["formula_correct"] is not None]
     retrieval_rows = [row for row in rows if row["retrieval_hit"] is not None]
     gate_rows = [row for row in rows if row["typed_gate_allowed"] is not None]
+    covered_rows = [row for row in rows if row["covered"]]
+    pairs = defaultdict(list)
+    for row in rows:
+        if row["pair_id"]:
+            pairs[row["pair_id"]].append(row)
+    complete_pairs = [pair for pair in pairs.values() if len(pair) == 2]
+    difficulty = {label: safe_div(sum(row["correct"] for row in rows if row["difficulty"] == label), sum(row["difficulty"] == label for row in rows)) for label in ("easy", "medium", "hard")}
     return {
         "n": len(rows), "accuracy": safe_div(sum(row["correct"] for row in rows), len(rows)),
         "parse_success_rate": safe_div(sum(row["parsed"] for row in rows), len(rows)),
@@ -91,5 +105,12 @@ def summarize_records(rows: list[dict]) -> dict:
         "relevant_source_recall_at_k": safe_div(sum(row["retrieval_hit"] for row in retrieval_rows), len(retrieval_rows)),
         "typed_gate_allowance_rate": safe_div(sum(row["typed_gate_allowed"] for row in gate_rows), len(gate_rows)),
         "typed_blocking_failures": sum(row["typed_blocking_failures"] for row in rows),
+        "true_but_inapplicable_recall": safe_div(sum(row["true_inapplicable_tp"] for row in rows), sum(row["true_inapplicable_total"] for row in rows)),
+        "false_evidence_recall": safe_div(sum(row["false_evidence_tp"] for row in rows), sum(row["false_evidence_total"] for row in rows)),
+        "coverage": safe_div(len(covered_rows), len(rows)),
+        "selective_accuracy": safe_div(sum(row["correct"] for row in covered_rows), len(covered_rows)),
+        "unsafe_answer_rate": safe_div(sum(row["unsafe_answer"] for row in rows), len(rows)),
+        "minimal_pair_decision_flip_accuracy": safe_div(sum(len({row["typed_gate_allowed"] for row in pair}) == 2 for pair in complete_pairs), len(complete_pairs)),
+        "difficulty_accuracy": difficulty,
         "error_counts": dict(Counter(row["primary_error"] or "none" for row in rows)),
     }
