@@ -21,17 +21,19 @@ class MockProvider(LLMProvider):
 
     def generate_json(self, system_prompt: str, user_prompt: str, schema: dict | None = None) -> dict:
         if system_prompt.startswith("Classify evidence") or "Relevance is not sufficient for applicability" in system_prompt:
-            evidence_ids = re.findall(r"^(\S+):", user_prompt, re.MULTILINE)
-            if not evidence_ids:
+            evidence_ids = []
+            if user_prompt.lstrip().startswith("{"):
                 try:
                     evidence_ids = [row["id"] for row in json.loads(user_prompt).get("candidate_evidence", [])]
                 except (json.JSONDecodeError, TypeError, KeyError):
                     evidence_ids = []
+            if not evidence_ids:
+                evidence_ids = re.findall(r"^(\S+):", user_prompt, re.MULTILINE)
             invalid_fixture_ids = {
                 "ev_37b5d8", "ev_e8a264", "ev_9b79a5", "ev_d5f767", "ev_292289",
                 "ev_107b9b", "ev_a50420", "ev_7d69ed", "ev_dca034", "ev_72b904",
             }
-            rejected = [evidence_id for evidence_id in evidence_ids if evidence_id in invalid_fixture_ids]
+            rejected = [evidence_id for evidence_id in evidence_ids if evidence_id in invalid_fixture_ids or evidence_id.endswith("_trap")]
             return {
                 "accepted_evidence_ids": [evidence_id for evidence_id in evidence_ids if evidence_id not in rejected],
                 "rejected_evidence_ids": rejected,

@@ -11,27 +11,31 @@
 - Added explicit oracle method names and predicted-formula executor methods.
 - Predicted methods accept `RuntimeQuestion`; selection failure abstains without oracle fallback.
 - Added gold-leakage, classifier-context, formula registry, and predicted-pipeline regression coverage.
+- Added explicit controlled-context method names and a separate BM25 retrieval track.
+- Added an independently stored seed evidence corpus with formula cards and controlled distractors.
+- Added retrieval rank/score/provenance records and formula/relevant-source metric columns.
+- Added v0.3 `RunRecord` plus aggregate usage fields for multi-call FAVE v2 pipelines.
 
 ## Validation
 
 - Historical pilot tests remain supported.
-- `pytest`: 16 passed, including leakage regression coverage.
+- `pytest`: 20 passed, including leakage and retrieval regression coverage.
 - Formula retrieval selects the correct registry formula for all ten seed questions without reading `GoldAnnotation`.
 - Mock smoke produced six successful predicted-mode records (two methods × three items) in a new `seed_smoke_v2` directory, with zero abstentions.
 - No paid API call was made for this refactor.
+- Retrieval smoke produced six records with retrieval provenance and relevant-source Recall@5 of 1.0.
 
 ## Remaining risks
 
-- The CLI evaluator still uses the legacy pilot evaluator; v2 formula/retrieval/error metrics are not yet wired into reports.
-- Formula retrieval is a deterministic lexical baseline, not BM25 or dense retrieval.
-- Controlled-context aliases and true retrieval methods are not yet fully separated in the registry.
-- Complete intermediate-call token/latency accounting is not yet implemented.
+- The evaluator is transitional: formula and relevant-source metrics are wired, but error taxonomy and conflict-type macro F1 remain incomplete.
+- Formula retrieval remains a deterministic lexical baseline; evidence retrieval now uses BM25.
+- Full intermediate-call accounting is implemented for the new FAVE predicted/retrieval paths but not every historical pilot method.
 - The benchmark remains a ten-item seed set; no thesis test claim is supported.
 - Human double annotation and agreement cannot be produced until actual independent labels exist.
 
 ## Next action
 
-1. Add formula Accuracy@1, Recall@3, and MRR to evaluator v2.
-2. Implement controlled-context method names and a real BM25 evidence corpus track.
-3. Add unified v0.3 `RunRecord` and full intermediate usage aggregation.
+1. Add error taxonomy, conflict-type macro F1, paired bootstrap, and Holm correction.
+2. Add annotation export/import/agreement scripts without fabricating human labels.
+3. Validate the new controlled and retrieval tracks on all ten seed items.
 4. Freeze prompts/evaluator before creating reviewed development and test splits.

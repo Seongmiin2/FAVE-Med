@@ -23,7 +23,7 @@ def make_provider(config):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
-    parser.add_argument("--method", choices=["llm_only", "cot", "vanilla_rag", "fave", "fave_silent", "demo", "demo_multi_executor", "fave_demo", "demo_oracle_executor", "fave_oracle_executor", "demo_predicted_executor", "fave_predicted_executor"])
+    parser.add_argument("--method", choices=["llm_only", "cot", "vanilla_rag", "fave", "fave_silent", "demo", "demo_multi_executor", "fave_demo", "demo_oracle_executor", "fave_oracle_executor", "demo_predicted_executor", "fave_predicted_executor", "vanilla_controlled_rag", "fave_controlled", "vanilla_retrieval_rag", "fave_retrieval"])
     parser.add_argument("--max-items", type=int, help="run only the first N benchmark items")
     args = parser.parse_args()
     load_dotenv()
@@ -40,7 +40,7 @@ def main():
         from ..domains.telecom.adapter import load_telecom_records
 
         runtime_by_id = {record.runtime.id: record.runtime for record in load_telecom_records(str(root / config["input_path"]))}
-    predicted_methods = {"demo_predicted_executor", "fave_predicted_executor"}
+    predicted_methods = {"demo_predicted_executor", "fave_predicted_executor", "vanilla_controlled_rag", "fave_controlled", "vanilla_retrieval_rag", "fave_retrieval"}
     for method in methods:
         output = root / config["output_dir"] / f"{method}.jsonl"
         completed = {row["id"] for row in read_jsonl(output)} if output.exists() and config.get("runtime", {}).get("resume") else set()

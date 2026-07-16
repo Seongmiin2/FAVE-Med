@@ -38,6 +38,18 @@ python -m applicability_qa.cli.run --config configs/experiments/telecom_pilot.ya
 python -m applicability_qa.cli.evaluate --config configs/experiments/telecom_pilot.yaml
 ```
 
+Gold leakage가 차단된 v0.3 predicted-formula smoke와 별도 BM25 retrieval track은 다음처럼 실행합니다.
+
+```powershell
+python -m applicability_qa.cli.run --config configs/experiments/telecom_seed_smoke_v2.yaml --max-items 3
+python -m applicability_qa.cli.evaluate --config configs/experiments/telecom_seed_smoke_v2.yaml
+
+python -m applicability_qa.cli.run --config configs/experiments/telecom_retrieval_seed_v2.yaml --max-items 3
+python -m applicability_qa.cli.evaluate --config configs/experiments/telecom_retrieval_seed_v2.yaml
+```
+
+Controlled-context track은 고정 evidence set으로 applicability 능력을 분리 측정합니다. Retrieval track은 별도 corpus에서 BM25 top-k를 검색하며 controlled evidence를 검색 결과로 위장하지 않습니다.
+
 일부 문항만 실행하려면 `--max-items 1` 또는 `--max-items 3`을 사용합니다. Mock 검증 후 OpenAI 3문항 실험은 다음 config로 준비되어 있습니다.
 
 ```powershell

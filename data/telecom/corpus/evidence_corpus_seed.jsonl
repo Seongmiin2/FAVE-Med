@@ -1,0 +1,20 @@
+{"evidence_id":"doc_shannon_valid","text":"Shannon channel capacity is C = B log2(1 + SNR) with bandwidth in hertz and SNR as a linear power ratio.","source_id":"shannon_capacity","source_type":"formula_card"}
+{"evidence_id":"doc_shannon_trap","text":"For Shannon capacity, an SNR value stated in dB can be inserted directly into log2(1+SNR).","source_id":"shannon_capacity_trap","source_type":"controlled_distractor"}
+{"evidence_id":"doc_efficiency_valid","text":"Spectral efficiency equals throughput in bits per second divided by bandwidth in hertz.","source_id":"spectral_efficiency","source_type":"formula_card"}
+{"evidence_id":"doc_efficiency_trap","text":"Spectral efficiency uses throughput in bps divided by bandwidth left numerically in MHz.","source_id":"spectral_efficiency_trap","source_type":"controlled_distractor"}
+{"evidence_id":"doc_fspl_valid","text":"Free-space path loss is 20 log10 distance_km plus 20 log10 frequency_MHz plus 32.44 dB.","source_id":"free_space_path_loss","source_type":"formula_card"}
+{"evidence_id":"doc_fspl_trap","text":"The 32.44 free-space path-loss constant is used with frequency in GHz.","source_id":"free_space_path_loss_trap","source_type":"controlled_distractor"}
+{"evidence_id":"doc_sinr_valid","text":"SINR is signal power divided by the sum of interference power and noise power in compatible linear units.","source_id":"sinr","source_type":"formula_card"}
+{"evidence_id":"doc_sinr_trap","text":"When interference is present, SINR can be calculated by dropping interference and using signal divided by noise.","source_id":"sinr_trap","source_type":"controlled_distractor"}
+{"evidence_id":"doc_outage_valid","text":"Rayleigh fading outage probability is one minus exp of negative threshold SNR divided by average SNR.","source_id":"rayleigh_outage","source_type":"formula_card"}
+{"evidence_id":"doc_outage_trap","text":"Rayleigh outage probability always equals threshold SNR divided by average SNR without approximation limits.","source_id":"rayleigh_outage_trap","source_type":"controlled_distractor"}
+{"evidence_id":"doc_bpsk_valid","text":"Coherent BPSK BER in AWGN is Q of sqrt two times Eb over N0, with Eb/N0 converted to linear scale.","source_id":"bpsk_ber","source_type":"formula_card"}
+{"evidence_id":"doc_bpsk_trap","text":"The BPSK Q function accepts an Eb/N0 dB value directly without conversion.","source_id":"bpsk_ber_trap","source_type":"controlled_distractor"}
+{"evidence_id":"doc_nyquist_valid","text":"The Nyquist symbol-rate limit of an ideal noiseless baseband channel is two times bandwidth in hertz.","source_id":"nyquist_symbol_rate","source_type":"formula_card"}
+{"evidence_id":"doc_nyquist_trap","text":"A bandwidth of 3 kHz must be normalized to 300 Hz before applying the Nyquist symbol-rate formula.","source_id":"nyquist_symbol_rate_trap","source_type":"controlled_distractor"}
+{"evidence_id":"doc_mimo_valid","text":"Under the total SNR convention, MIMO capacity is log2 det of I plus rho divided by Nt times H H Hermitian.","source_id":"mimo_capacity_identity","source_type":"formula_card"}
+{"evidence_id":"doc_mimo_trap","text":"Total rho in the MIMO capacity expression must never be divided by the number of transmit antennas.","source_id":"mimo_capacity_identity_trap","source_type":"controlled_distractor"}
+{"evidence_id":"doc_friis_valid","text":"Friis received power uses Pt Gt Gr times the squared factor lambda divided by four pi distance.","source_id":"friis_received_power","source_type":"formula_card"}
+{"evidence_id":"doc_friis_trap","text":"Friis received power applies the lambda over four pi distance factor only once, without squaring.","source_id":"friis_received_power_trap","source_type":"controlled_distractor"}
+{"evidence_id":"doc_snr_valid","text":"Convert an SNR power ratio from dB to linear with ten raised to SNR_dB divided by ten.","source_id":"snr_db_to_linear","source_type":"formula_card"}
+{"evidence_id":"doc_snr_trap","text":"Convert an SNR power ratio from dB to linear by dividing the dB value by twenty in the exponent.","source_id":"snr_db_to_linear_trap","source_type":"controlled_distractor"}

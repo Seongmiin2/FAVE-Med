@@ -1,0 +1,26 @@
+experiment_name: telecom_retrieval_seed_v2
+domain: telecom
+input_path: data/telecom/benchmark/fave_bench_10.jsonl
+output_dir: outputs/telecom/retrieval_seed_v2
+result_dir: results/telecom/retrieval_seed_v2
+prompt_version: telecom_applicability_v2
+schema_version: "0.3"
+evaluator_version: v2
+model:
+  provider: mock
+  name: mock
+  temperature: 0
+  max_retries: 1
+retrieval:
+  enabled: true
+  method: bm25
+  top_k: 5
+  corpus_path: data/telecom/corpus/evidence_corpus_seed.jsonl
+methods:
+  - vanilla_retrieval_rag
+  - fave_retrieval
+runtime:
+  seed: 42
+  resume: false
+  save_raw_response: true
+  fail_on_gold_leakage: true

@@ -20,3 +20,9 @@ def test_classifier_receives_question_and_returns_decisions():
     assert item.question in provider.user_prompt
     assert result.decisions[0].evidence_id == "e1"
     assert result.decisions[0].label in {"valid", "contested", "rejected"}
+
+
+def test_mock_retrieval_trap_is_rejected():
+    item = RuntimeQuestion(id="1", domain="telecom", question="Compute capacity", evidence=[RuntimeEvidence(id="doc_capacity_trap", text="Insert dB directly")])
+    result = classify_evidence(item, item.evidence, MockProvider())
+    assert result.decisions[0].label == "rejected"

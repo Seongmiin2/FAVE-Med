@@ -9,10 +9,15 @@ from .fave_oracle_executor import run_fave_oracle_executor
 from .fave_predicted_executor import run_fave_predicted_executor
 from .llm_only import run_llm_only
 from .vanilla_rag import run_vanilla_rag
+from .vanilla_controlled_rag import run_vanilla_controlled_rag
+from .vanilla_retrieval_rag import run_vanilla_retrieval_rag
+from .fave_controlled import run_fave_controlled
+from .fave_retrieval import run_fave_retrieval
 
 PIPELINES = {"llm_only": run_llm_only, "cot": run_cot, "vanilla_rag": run_vanilla_rag, "fave": run_fave, "demo": run_demo, "fave_demo": run_fave_demo}
 PIPELINES.update({"fave_silent": run_fave, "demo_multi_executor": run_demo_multi_executor})
 PIPELINES.update({"demo_oracle_executor": run_demo_oracle_executor, "fave_oracle_executor": run_fave_oracle_executor, "demo_predicted_executor": run_demo_predicted_executor, "fave_predicted_executor": run_fave_predicted_executor})
+PIPELINES.update({"vanilla_controlled_rag": run_vanilla_controlled_rag, "fave_controlled": run_fave_controlled, "vanilla_retrieval_rag": run_vanilla_retrieval_rag, "fave_retrieval": run_fave_retrieval})
 
 
 def run_pipeline(name, item, provider, config):
@@ -21,6 +26,15 @@ def run_pipeline(name, item, provider, config):
         result["method"] = name
         result["model"] = config.get("model", {}).get("name")
         result["prompt_version"] = config.get("prompt_version", "v1")
+        result["experiment_id"] = config.get("experiment_name", "unversioned")
+        result["schema_version"] = str(config.get("schema_version", "0.2"))
+        result["evaluator_version"] = config.get("evaluator_version", "v1")
+        result.setdefault("formula_mode", "none")
+        result.setdefault("is_primary_result", True)
+        result.setdefault("retrieval", None)
+        result.setdefault("evidence_decisions", [])
+        result.setdefault("formula_selection", None)
+        result["usage"].setdefault("total_calls", 1 if result["usage"].get("input_tokens") or result["usage"].get("output_tokens") else 0)
         return result
     except Exception as exc:
         return {"id": item.id, "domain": item.domain, "method": name, "model": config.get("model", {}).get("name"), "prompt_version": config.get("prompt_version", "v1"), "answer": {"final_value": None, "final_unit": None}, "abstain": True, "abstain_reason": "pipeline_error", "accepted_evidence_ids": [], "rejected_evidence_ids": [], "extracted_variables": {}, "verification": {}, "execution": {"mode": "llm", "success": False, "error": str(exc)}, "usage": {"input_tokens": 0, "output_tokens": 0, "latency_seconds": 0.0}, "raw_response": {}}
