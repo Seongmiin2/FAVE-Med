@@ -11,7 +11,7 @@ from ..domains.telecom.formula_registry import formula_by_id, load_formula_regis
 from ..domains.telecom.formula_selector import select_formula
 from ..domains.telecom.requirement_parser import parse_requirement
 from ..retrieval import BM25Retriever, load_corpus
-from .common import normalize, validate_extraction
+from .common import extraction_json_schema, normalize, validate_extraction
 from .fave_demo import EXTRACTION_SYSTEM
 
 
@@ -28,7 +28,8 @@ def run_typed_fave_retrieval_predicted_executor(item, provider, config):
     passage_decisions = [verify_applicability(requirement, row) for row in signatures]
     accepted = [row.evidence_id for row in passage_decisions if row.applicable]
     context = "\n".join(row.text for row in retrieved if row.evidence_id in accepted)
-    raw = provider.generate_json(EXTRACTION_SYSTEM, f"Formula: {formula.expression}\nQuestion: {item.question}\nApplicable evidence:\n{context}")
+    names = [row.name for row in requirement.required_inputs]
+    raw = provider.generate_json(EXTRACTION_SYSTEM + f" Use exactly these variable keys: {names}.", f"Formula: {formula.expression}\nQuestion: {item.question}\nApplicable evidence:\n{context}", schema=extraction_json_schema(names))
     validate_extraction(raw, config.get("runtime", {}).get("strict_structured_output", False))
     variables = raw.get("extracted_variables", {})
     normalized_facts = dict(variables)

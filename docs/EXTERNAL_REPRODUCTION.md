@@ -34,3 +34,15 @@ must record repository commit, model snapshot, corpus hash, thresholds, search
 backend, and prompt hash. Until those dependencies are supplied and the
 official entry points run, the correct status is `reproduction_prepared`, not
 `reproduced`.
+
+## Development execution status
+
+On 2026-07-16, the pinned MedRaC code completed a three-record development
+subset using its Formula-RAG, structured extraction, generated-Python execution,
+and regular evaluator. It scored 2/3. This establishes an executable partial
+reproduction, not the paper's full multi-model result reproduction. See
+`reports/PAID_DEVELOPMENT_REPRODUCTION_20260716.md`.
+
+CRAG remains prepared but unexecuted because the required evaluator/generator
+checkpoints, CUDA runtime, and Google-search-compatible credential are not
+available in this workspace.

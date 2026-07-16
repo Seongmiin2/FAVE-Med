@@ -32,6 +32,9 @@
 - Added typed requirement/evidence signatures, deterministic compatibility checks, solution plans, execution gates, and post-execution validation.
 - Connected the typed gate to Telecom and Medical predicted-executor paths without exposing evaluator gold at runtime.
 - Added explicitly named comparison proxy baselines and offline minimal-pair, difficulty, and benchmark-track helpers.
+- Completed a paid three-record official-code MedRaC development reproduction: 2/3 correct with recorded environment deviations.
+- Completed typed gpt-4o-mini development pilots: Telecom 3/3 correct; Medical correctly executed supported Cockcroft-Gault and safely abstained on unsupported HEART/CURB-65 tasks.
+- Added strict registry-key JSON Schema extraction and a low-confidence medical calculator abstention threshold based on real-model failures.
 
 ## Validation
 
