@@ -51,8 +51,10 @@ class MockProvider(LLMProvider):
             ("Convert SNR", 19.952623, "linear", {"snr_db": 13}),
         ]
         if not callable(self.response):
+            question_match = re.search(r"^Question:\s*(.+)$", user_prompt, re.MULTILINE)
+            fixture_text = question_match.group(1) if question_match else user_prompt
             for marker, answer, unit, variables in fixtures:
-                if marker in user_prompt:
+                if marker in fixture_text:
                     return {
                         "answer": {"final_value": answer, "final_unit": unit},
                         "extracted_variables": variables,

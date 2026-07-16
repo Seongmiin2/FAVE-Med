@@ -1,0 +1,12 @@
+{
+  "candidate_count": 129,
+  "family_count": 15,
+  "numeric_answer_candidates": 107,
+  "explicit_calculation_candidates": 9,
+  "numeric_and_explicit_calculation_candidates": 3,
+  "status_counts": {
+    "needs_review": 129
+  },
+  "readiness": "not_experiment_ready",
+  "reason": "Human review, quantitative adaptation, independent answer/unit verification, evidence construction, and license verification are incomplete."
+}

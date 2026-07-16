@@ -19,11 +19,11 @@ def run_fave_predicted_executor(item, provider, config):
         raw.update(answer={"final_value": None, "final_unit": None}, abstain=True, abstain_reason=selection["abstain_reason"], execution={"mode": "python", "success": False, "error": selection["abstain_reason"]})
     else:
         formula = formula_by_id(selection["predicted_formula_id"], registry)
-        generated = provider.generate_json(EXTRACTION_SYSTEM, f"Formula: {formula['expression']}\nQuestion: {item.question}\nApplicable evidence:\n{evidence_text}")
+        generated = provider.generate_json(EXTRACTION_SYSTEM, f"Formula: {formula.expression}\nQuestion: {item.question}\nApplicable evidence:\n{evidence_text}")
         raw.update(generated)
         raw["usage"] = merge_usage(classification.usage, generated.get("usage", {}))
         try:
-            value, unit = execute(formula["executor_name"], raw.get("extracted_variables", {}))
+            value, unit = execute(formula.executor_name, raw.get("extracted_variables", {}))
             raw.update(answer={"final_value": value, "final_unit": unit}, execution={"mode": "python", "success": True, "error": None})
         except Exception as exc:
             raw.update(answer={"final_value": None, "final_unit": None}, abstain=True, abstain_reason="executor_failure", execution={"mode": "python", "success": False, "error": str(exc)})

@@ -16,6 +16,31 @@ class FormulaSpec(BaseModel):
     expression: str | None = None
 
 
+class FormulaVariableSpec(BaseModel):
+    name: str
+    quantity: str
+    canonical_unit: str
+    accepted_aliases: list[str] = Field(default_factory=list)
+
+
+class FormulaOutputSpec(BaseModel):
+    quantity: str
+    canonical_unit: str
+
+
+class TelecomFormulaSpec(BaseModel):
+    formula_id: str
+    name: str
+    expression: str
+    description: str
+    required_variables: list[FormulaVariableSpec]
+    output: FormulaOutputSpec
+    applicability_conditions: list[str] = Field(default_factory=list)
+    unsupported_conditions: list[str] = Field(default_factory=list)
+    aliases: list[str] = Field(default_factory=list)
+    executor_name: str
+
+
 class EvidenceItem(BaseModel):
     id: str
     text: str

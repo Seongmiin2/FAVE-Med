@@ -2,6 +2,7 @@ from applicability_qa.core.schemas import RuntimeEvidence, RuntimeQuestion
 from applicability_qa.pipelines import run_pipeline
 from applicability_qa.providers.mock_provider import MockProvider
 from applicability_qa.domains.telecom.adapter import load_telecom_records
+from applicability_qa.domains.telecom.adapter import convert_fave_record
 
 
 class CapturingProvider(MockProvider):
@@ -50,3 +51,16 @@ def test_seed_formula_selection_is_correct_without_pipeline_gold_access():
     for record in records:
         result = run_pipeline("demo_predicted_executor", record.runtime, CapturingProvider(), {"model": {"name": "mock"}})
         assert result["formula_selection"]["predicted_formula_id"] == record.gold.formula_id
+
+
+def test_runtime_does_not_derive_requested_output_from_gold_unit():
+    base = {"id": "u1", "question": "Calculate channel capacity.", "gold_value": 1, "gold_formula": "C = B log2(1 + SNR_linear)"}
+    first = convert_fave_record({**base, "gold_unit": "GOLD_UNIT_SENTINEL_DO_NOT_LEAK"})
+    second = convert_fave_record({**base, "gold_unit": "bps"})
+    assert first.runtime.requested_output is None
+    assert first.runtime == second.runtime
+
+
+def test_runtime_extracts_only_explicit_question_unit():
+    row = {"id": "u2", "question": "Calculate channel capacity and report the result in Mbps.", "gold_value": 1, "gold_unit": "GOLD_UNIT_SENTINEL_DO_NOT_LEAK", "gold_formula": "C = B log2(1 + SNR_linear)"}
+    assert convert_fave_record(row).runtime.requested_output == "Mbps"

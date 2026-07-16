@@ -15,9 +15,9 @@ def run_demo_predicted_executor(item, provider, config):
         raw = {"answer": {"final_value": None, "final_unit": None}, "abstain": True, "abstain_reason": selection["abstain_reason"], "execution": {"mode": "python", "success": False, "error": selection["abstain_reason"]}}
     else:
         formula = formula_by_id(selection["predicted_formula_id"], registry)
-        raw = provider.generate_json(EXTRACTION_SYSTEM, f"Formula: {formula['expression']}\nQuestion: {item.question}\nContext:\n{evidence_text}")
+        raw = provider.generate_json(EXTRACTION_SYSTEM, f"Formula: {formula.expression}\nQuestion: {item.question}\nContext:\n{evidence_text}")
         try:
-            value, unit = execute(formula["executor_name"], raw.get("extracted_variables", {}))
+            value, unit = execute(formula.executor_name, raw.get("extracted_variables", {}))
             raw.update(answer={"final_value": value, "final_unit": unit}, execution={"mode": "python", "success": True, "error": None})
         except Exception as exc:
             raw.update(answer={"final_value": None, "final_unit": None}, abstain=True, abstain_reason="executor_failure", execution={"mode": "python", "success": False, "error": str(exc)})
