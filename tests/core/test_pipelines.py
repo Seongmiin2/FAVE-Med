@@ -17,3 +17,13 @@ def test_mock_pipelines_share_output_schema():
     assert all(set(row) == REQUIRED for row in results)
     assert all(set(row["answer"]) == {"final_value", "final_unit"} for row in results)
     assert all(row["execution"]["success"] for row in results)
+
+
+def test_all_telecom_items_execute_with_mock_provider():
+    items = load_telecom_items("data/telecom/benchmark/fave_bench_10.jsonl")
+    config = {"model": {"name": "mock-model"}, "prompt_version": "test-v1"}
+    for method in ("demo_multi_executor", "fave_demo"):
+        results = [run_pipeline(method, item, MockProvider(), config) for item in items]
+        assert len(results) == 10
+        assert all(result["execution"]["success"] for result in results)
+        assert all(not result["abstain"] for result in results)

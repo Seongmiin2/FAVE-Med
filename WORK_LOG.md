@@ -64,11 +64,12 @@ usage, raw_response
 - `python -m pip install -e .`: 성공
 - package import 및 전체 source compile: 성공
 - `TODO`, `FIXME`, `NotImplementedError`, 임시 `pass`, 빈 `...`: 없음
-- `python -m pytest -q`: `8 passed`
+- `python -m pytest -q`: `10 passed`
 - Telecom 첫 pilot 문항 adapter 변환: 성공
 - BMI 직접 실행: `22.857142857142858 kg/m^2`
-- mock 기반 `llm_only`, `vanilla_rag`, `fave`, `demo`, `fave_demo`: 한 문항 실행 성공
+- mock 기반 `llm_only`, `vanilla_rag`, `fave_silent`, `demo_multi_executor`, `fave_demo`: Telecom 10문항 전체 실행 성공
 - 5개 mock 결과의 최상위 JSONL 스키마 일치 확인
+- 10개 Telecom pilot 공식의 결정론적 실행 성공
 - `--max-items 1`, `--max-items 3` 동작 확인
 
 ## 4. 평가 지표
@@ -129,11 +130,11 @@ python -m applicability_qa.cli.evaluate `
 
 ## 6. 남은 문제
 
-- Mock provider는 첫 Telecom 문항 중심 fixture이므로 여러 공식의 변수 추출 mock을 추가해야 한다.
-- 10문항 전체 FAVE-DeMo 실행 전 Telecom 공식 executor 지원 범위를 확장해야 한다.
-- `demo_multi_executor`의 mock 3문항 실행에서는 첫 문항만 성공하고 나머지 두 문항은 안전하게 abstain했다.
-- OpenAI 3문항 실험은 실행 가능하지만 API 키와 비용 확인 후 수행해야 한다.
-- Telecom 10문항 중 LLM-only, Vanilla RAG, FAVE 계열은 실행 가능하다. 결정론적 executor를 포함한 전체 비교는 공식 지원 범위 확장 후 진행하는 것이 적절하다.
+- Telecom mock 10문항은 5개 비교 방법 모두 실행 성공했으며 accuracy와 parse success rate가 1.0이다.
+- FAVE 계열 mock의 invalid evidence precision/recall/F1은 1.0이고 valid evidence false rejection rate는 0.0이다.
+- OpenAI 3문항 및 10문항 실험은 실행 준비가 끝났지만 API 키와 비용 확인 후 수행해야 한다.
+- Mock 결과는 실행·스키마·평가기 회귀 검증용 fixture이며 실제 모델 성능 결과로 해석하면 안 된다.
+- 지원 범위는 현재 pilot 10문항 공식에 맞춰져 있으므로 새로운 Telecom 공식이 추가되면 executor도 함께 확장해야 한다.
 
 ## 7. 원본 출처
 
