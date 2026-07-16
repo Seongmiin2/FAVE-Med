@@ -67,7 +67,9 @@ def main() -> None:
     for row in statistical_rows:
         row.update(corrected[row["comparison"]])
     write_csv(result_dir / "statistics.csv", statistical_rows)
-    lines = [f"# {config['experiment_name']} report", "", "Mock results validate integration only; they are not research performance evidence.", "", "| Method | N | Accuracy | Parse success | Formula Acc@1 | Retrieval Recall@k |", "|---|---:|---:|---:|---:|---:|"]
+    provider_name = config.get("model", {}).get("provider", "unknown")
+    qualification = "Mock results validate integration only; they are not research performance evidence." if provider_name == "mock" else "Small pilot results validate execution and cost only; the sample is too small for research conclusions."
+    lines = [f"# {config['experiment_name']} report", "", qualification, "", "| Method | N | Accuracy | Parse success | Formula Acc@1 | Retrieval Recall@k |", "|---|---:|---:|---:|---:|---:|"]
     lines.extend(f"| {row['method']} | {row['n']} | {row['accuracy']:.3f} | {row['parse_success_rate']:.3f} | {row['formula_accuracy_at_1']:.3f} | {row['relevant_source_recall_at_k']:.3f} |" for row in summaries)
     (result_dir / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"wrote thesis evaluation artifacts -> {result_dir}")

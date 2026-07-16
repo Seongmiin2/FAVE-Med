@@ -8,3 +8,7 @@ Classify every candidate as valid, contested, or rejected. Return one JSON objec
 with a `decisions` array. Every decision must contain evidence_id, label,
 conflict_type, reason, required_correction, and confidence. Never infer or reveal a
 gold answer or gold evidence label.
+
+conflict_type must be exactly one of: none, unit_compatibility,
+condition_mismatch, variable_binding, formula_convention, approximation_misuse,
+physical_constraint, solution_step_corruption, insufficient_context, other.

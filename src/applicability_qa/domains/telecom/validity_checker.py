@@ -10,6 +10,30 @@ from ...core.errors import StructuredOutputError
 
 PROMPT_PATH = Path(__file__).resolve().parents[4] / "configs" / "prompts" / "telecom" / "applicability_v2.txt"
 
+CLASSIFICATION_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "decisions": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "properties": {
+                    "evidence_id": {"type": "string"},
+                    "label": {"type": "string", "enum": ["valid", "contested", "rejected"]},
+                    "conflict_type": {"type": "string", "enum": ["none", "unit_compatibility", "condition_mismatch", "variable_binding", "formula_convention", "approximation_misuse", "physical_constraint", "solution_step_corruption", "insufficient_context", "other"]},
+                    "reason": {"type": "string"},
+                    "required_correction": {"type": ["string", "null"]},
+                    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+                },
+                "required": ["evidence_id", "label", "conflict_type", "reason", "required_correction", "confidence"],
+            },
+        }
+    },
+    "required": ["decisions"],
+}
+
 
 def classify_evidence(
     item: RuntimeQuestion,
@@ -25,7 +49,7 @@ def classify_evidence(
         "explicit_information": item.metadata.get("explicit_information", []),
         "candidate_evidence": [row.model_dump() for row in evidence],
     }
-    raw = provider.generate_json(system, json.dumps(payload, ensure_ascii=False))
+    raw = provider.generate_json(system, json.dumps(payload, ensure_ascii=False), CLASSIFICATION_SCHEMA)
     decisions = raw.get("decisions")
     if decisions is None:
         if strict:
@@ -56,19 +80,20 @@ def classify_evidence(
     return EvidenceClassificationResult(decisions=parsed, usage=raw.get("usage", {}))
 
 
+def runtime_from_item(item) -> RuntimeQuestion:
+    if isinstance(item, RuntimeQuestion):
+        return item
+    return RuntimeQuestion(
+        id=item.id, domain=item.domain, question=item.question,
+        requested_output=item.metadata.get("requested_output"),
+        evidence=[RuntimeEvidence(id=row.id, text=row.text) for row in item.evidence],
+        metadata={key: value for key, value in item.metadata.items() if key not in {"expected_arbitration", "invalid_evidence", "tolerance"}},
+    )
+
+
 def select_evidence(item, provider=None) -> tuple[list[str], list[str]]:
     """Legacy pilot wrapper. New code should call classify_evidence()."""
-    if isinstance(item, RuntimeQuestion):
-        runtime = item
-    else:
-        runtime = RuntimeQuestion(
-            id=item.id,
-            domain=item.domain,
-            question=item.question,
-            requested_output=item.metadata.get("requested_output"),
-            evidence=[RuntimeEvidence(id=row.id, text=row.text) for row in item.evidence],
-            metadata={key: value for key, value in item.metadata.items() if key not in {"expected_arbitration", "invalid_evidence", "tolerance"}},
-        )
+    runtime = runtime_from_item(item)
     if provider is None:
         raise ValueError("A provider is required; gold evidence labels are never used for runtime selection")
     result = classify_evidence(runtime, runtime.evidence, provider)

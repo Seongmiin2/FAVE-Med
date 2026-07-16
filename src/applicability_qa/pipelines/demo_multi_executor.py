@@ -8,6 +8,8 @@ EXTRACTION_SYSTEM = (
     "Use the variable names shown in the formula: B and C in base SI units, d in km and f in MHz "
     "when the formula explicitly uses d_km and f_MHz, plus rho, Nt, H, S, I, N, gamma_th, "
     "gamma_bar, eb_n0_db, Pt, Gt, Gr, lambda, and snr_db where applicable. "
+    "Every numeric input explicitly provided by the question must appear at the top level of "
+    "extracted_variables, including snr_db even when it must later be converted to snr_linear. "
     "Do not calculate or return the final answer."
 )
 

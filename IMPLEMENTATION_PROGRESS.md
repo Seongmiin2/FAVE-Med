@@ -28,12 +28,14 @@
 - Pinned MedCalc-Bench-Verified at revision `591157b3343b4dda247294f9d929da4c75026fa8` with CC BY-SA 4.0 attribution and local SHA-256 verification.
 - Added Medical v0.3 runtime/gold separation, patient-note prompt inclusion, ten typed calculator specifications, ten exact-ID executors, calculator selection, applicability cards, and five mock pipeline methods.
 - Created a non-gold Medical selection manifest with 20 development and 100 test candidates across ten families.
+- Completed a real GPT-5.4 snapshot Telecom 3-item pilot over five methods after strict-schema and usage-accounting fixes.
 
 ## Validation
 
 - Historical pilot tests remain supported.
 - `pytest`: 42 passed, including dual-domain leakage, strict parsing, exact dispatch, statistics, and end-to-end mock coverage.
 - Mock end-to-end smoke completed four methods over all ten seed items; these fixture results are not model-performance evidence.
+- Real API v4 pilot produced 15 records through 21 calls with zero parse/execution failures; 4,912 input and 3,362 output tokens cost an estimated USD 0.06271.
 - Formula retrieval selects the correct registry formula for all ten seed questions without reading `GoldAnnotation`.
 - Mock smoke produced six successful predicted-mode records (two methods × three items) in a new `seed_smoke_v2` directory, with zero abstentions.
 - No paid API call was made for this refactor.

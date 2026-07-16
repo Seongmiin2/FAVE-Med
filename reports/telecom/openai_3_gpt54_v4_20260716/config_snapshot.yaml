@@ -1,0 +1,8 @@
+experiment_name: telecom_openai_3_gpt54_v4_20260716
+domain: telecom
+items: 3
+model: {provider: openai, name: gpt-5.4-2026-03-05, temperature: 0, max_retries: 1}
+methods: [llm_only, vanilla_rag, fave_silent, demo_multi_executor, fave_demo]
+runtime: {seed: 42, strict_structured_output: true}
+schema_version: "0.3"
+evaluator_version: v2

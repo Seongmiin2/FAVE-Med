@@ -1,0 +1,11 @@
+{
+  "model": "gpt-5.4-2026-03-05",
+  "records": 15,
+  "calls": 21,
+  "input_tokens": 4912,
+  "output_tokens": 3362,
+  "input_usd_per_million": 2.5,
+  "output_usd_per_million": 15.0,
+  "estimated_usd": 0.06271,
+  "approved_cap_usd": 2.0
+}

@@ -1,0 +1,6 @@
+method,n,accuracy,parse_success_rate,abstention_rate,invalid_evidence_f1
+demo_multi_executor,3,1.0,1.0,0.0,0.0
+fave_demo,3,1.0,1.0,0.0,0.8
+fave_silent,3,0.6666666667,1.0,0.0,0.8
+llm_only,3,1.0,1.0,0.0,0.0
+vanilla_rag,3,0.6666666667,1.0,0.0,0.0
