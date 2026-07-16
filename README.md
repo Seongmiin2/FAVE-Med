@@ -2,6 +2,12 @@
 
 FAVE-RAG의 증거 적용 가능성 검증과 DeMo-Med의 공식 분해·검증·결정론적 실행을 하나의 정량 QA 실험 프레임워크로 재구성한 프로젝트입니다. 원본 저장소와 원본 데이터는 수정하지 않습니다.
 
+> The 10-item experiment is a feasibility pilot, not a definitive benchmark result.
+> Executor-based historical methods use an oracle formula and therefore measure
+> variable extraction plus deterministic execution under an upper-bound condition.
+> Primary thesis results must use predicted-formula methods with no gold formula,
+> answer, variable annotation, or evidence labels in runtime inputs.
+
 ## 연구 질문
 
 증거 검증과 단계별 계산을 결합했을 때 정량 QA의 정확성과 강건성이 얼마나 개선되는지 비교합니다.
